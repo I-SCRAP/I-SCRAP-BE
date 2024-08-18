@@ -1,0 +1,412 @@
+[
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71b9f" },
+    "name": "Summer Art Gallery",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71b9f" },
+      { "$oid": "64dcc0a6f001b623d8a71ba1" }
+    ],
+    "poster": "https://example.com/poster2.jpg",
+    "detailImages": [
+      "https://example.com/detail3.jpg",
+      "https://example.com/detail4.jpg"
+    ],
+    "fee": 1200,
+    "operatingHours": {
+      "Monday": { "open": "10:00", "close": "18:00" },
+      "Tuesday": { "open": "10:00", "close": "18:00" },
+      "Wednesday": { "open": "10:00", "close": "18:00" },
+      "Thursday": { "open": "10:00", "close": "18:00" },
+      "Friday": { "open": "10:00", "close": "18:00" },
+      "Saturday": { "open": "10:00", "close": "16:00" },
+      "Sunday": { "closed": true }
+    },
+    "sizeInfo": {
+      "width": "15m",
+      "height": "7m"
+    },
+    "description": "A summer exhibition featuring local artists.",
+    "dateRange": {
+      "start": { "$date": "2024-06-01T00:00:00Z" },
+      "end": { "$date": "2024-06-30T23:59:59Z" }
+    },
+    "location": {
+      "address": "Busan",
+      "latitude": 35.1796,
+      "longitude": 129.0756
+    },
+    "category": "Art Exhibition",
+    "websiteURL": "https://example.com/summer-art",
+    "tags": ["art", "gallery", "summer"],
+    "createdDate": { "$date": "2024-05-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba0" },
+    "name": "Tech Innovations Expo",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71ba2" },
+      { "$oid": "64dcc0a6f001b623d8a71ba3" }
+    ],
+    "poster": "https://example.com/poster3.jpg",
+    "detailImages": [
+      "https://example.com/detail5.jpg",
+      "https://example.com/detail6.jpg"
+    ],
+    "fee": 2000,
+    "operatingHours": {
+      "Monday": { "open": "09:00", "close": "19:00" },
+      "Tuesday": { "open": "09:00", "close": "19:00" },
+      "Wednesday": { "open": "09:00", "close": "19:00" },
+      "Thursday": { "open": "09:00", "close": "19:00" },
+      "Friday": { "open": "09:00", "close": "19:00" },
+      "Saturday": { "open": "09:00", "close": "17:00" },
+      "Sunday": { "closed": true }
+    },
+    "sizeInfo": {
+      "width": "20m",
+      "height": "10m"
+    },
+    "description": "Explore the latest in tech innovations.",
+    "dateRange": {
+      "start": { "$date": "2024-09-01T00:00:00Z" },
+      "end": { "$date": "2024-09-15T23:59:59Z" }
+    },
+    "location": {
+      "address": "Daejeon",
+      "latitude": 36.3504,
+      "longitude": 127.3845
+    },
+    "category": "Technology Expo",
+    "websiteURL": "https://example.com/tech-expo",
+    "tags": ["technology", "innovation", "expo"],
+    "createdDate": { "$date": "2024-08-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba1" },
+    "name": "Culinary Delights Festival",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71ba4" },
+      { "$oid": "64dcc0a6f001b623d8a71ba5" }
+    ],
+    "poster": "https://example.com/poster4.jpg",
+    "detailImages": [
+      "https://example.com/detail7.jpg",
+      "https://example.com/detail8.jpg"
+    ],
+    "fee": 1500,
+    "operatingHours": {
+      "Monday": { "open": "11:00", "close": "21:00" },
+      "Tuesday": { "open": "11:00", "close": "21:00" },
+      "Wednesday": { "open": "11:00", "close": "21:00" },
+      "Thursday": { "open": "11:00", "close": "21:00" },
+      "Friday": { "open": "11:00", "close": "21:00" },
+      "Saturday": { "open": "11:00", "close": "21:00" },
+      "Sunday": { "open": "11:00", "close": "21:00" }
+    },
+    "sizeInfo": {
+      "width": "30m",
+      "height": "15m"
+    },
+    "description": "A festival for food lovers with cuisines from around the world.",
+    "dateRange": {
+      "start": { "$date": "2024-07-01T00:00:00Z" },
+      "end": { "$date": "2024-07-10T23:59:59Z" }
+    },
+    "location": {
+      "address": "Incheon",
+      "latitude": 37.4563,
+      "longitude": 126.7052
+    },
+    "category": "Food Festival",
+    "websiteURL": "https://example.com/culinary-festival",
+    "tags": ["food", "festival", "culinary"],
+    "createdDate": { "$date": "2024-06-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba2" },
+    "name": "Vintage Car Show",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71ba6" },
+      { "$oid": "64dcc0a6f001b623d8a71ba7" }
+    ],
+    "poster": "https://example.com/poster5.jpg",
+    "detailImages": [
+      "https://example.com/detail9.jpg",
+      "https://example.com/detail10.jpg"
+    ],
+    "fee": 1800,
+    "operatingHours": {
+      "Monday": { "open": "10:00", "close": "20:00" },
+      "Tuesday": { "open": "10:00", "close": "20:00" },
+      "Wednesday": { "open": "10:00", "close": "20:00" },
+      "Thursday": { "open": "10:00", "close": "20:00" },
+      "Friday": { "open": "10:00", "close": "20:00" },
+      "Saturday": { "open": "10:00", "close": "20:00" },
+      "Sunday": { "open": "10:00", "close": "20:00" }
+    },
+    "sizeInfo": {
+      "width": "50m",
+      "height": "25m"
+    },
+    "description": "A display of vintage cars from the 1920s to the 1980s.",
+    "dateRange": {
+      "start": { "$date": "2024-08-01T00:00:00Z" },
+      "end": { "$date": "2024-08-05T23:59:59Z" }
+    },
+    "location": {
+      "address": "Gwangju",
+      "latitude": 35.1595,
+      "longitude": 126.8526
+    },
+    "category": "Car Show",
+    "websiteURL": "https://example.com/vintage-car-show",
+    "tags": ["cars", "vintage", "show"],
+    "createdDate": { "$date": "2024-07-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba3" },
+    "name": "Winter Wonderland",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71ba8" },
+      { "$oid": "64dcc0a6f001b623d8a71ba9" }
+    ],
+    "poster": "https://example.com/poster6.jpg",
+    "detailImages": [
+      "https://example.com/detail11.jpg",
+      "https://example.com/detail12.jpg"
+    ],
+    "fee": 2500,
+    "operatingHours": {
+      "Monday": { "open": "10:00", "close": "22:00" },
+      "Tuesday": { "open": "10:00", "close": "22:00" },
+      "Wednesday": { "open": "10:00", "close": "22:00" },
+      "Thursday": { "open": "10:00", "close": "22:00" },
+      "Friday": { "open": "10:00", "close": "22:00" },
+      "Saturday": { "open": "10:00", "close": "22:00" },
+      "Sunday": { "open": "10:00", "close": "22:00" }
+    },
+    "sizeInfo": {
+      "width": "40m",
+      "height": "20m"
+    },
+    "description": "A winter festival with ice skating, food, and entertainment.",
+    "dateRange": {
+      "start": { "$date": "2024-12-01T00:00:00Z" },
+      "end": { "$date": "2024-12-31T23:59:59Z" }
+    },
+    "location": {
+      "address": "Seoul",
+      "latitude": 37.5665,
+      "longitude": 126.978
+    },
+    "category": "Winter Festival",
+    "websiteURL": "https://example.com/winter-wonderland",
+    "tags": ["winter", "festival", "entertainment"],
+    "createdDate": { "$date": "2024-11-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba4" },
+    "name": "Spring Music Festival",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71baa" },
+      { "$oid": "64dcc0a6f001b623d8a71bab" }
+    ],
+    "poster": "https://example.com/poster7.jpg",
+    "detailImages": [
+      "https://example.com/detail13.jpg",
+      "https://example.com/detail14.jpg"
+    ],
+    "fee": 3000,
+    "operatingHours": {
+      "Monday": { "open": "12:00", "close": "23:00" },
+      "Tuesday": { "open": "12:00", "close": "23:00" },
+      "Wednesday": { "open": "12:00", "close": "23:00" },
+      "Thursday": { "open": "12:00", "close": "23:00" },
+      "Friday": { "open": "12:00", "close": "23:00" },
+      "Saturday": { "open": "12:00", "close": "23:00" },
+      "Sunday": { "open": "12:00", "close": "23:00" }
+    },
+    "sizeInfo": {
+      "width": "100m",
+      "height": "50m"
+    },
+    "description": "A music festival featuring bands and artists from various genres.",
+    "dateRange": {
+      "start": { "$date": "2024-04-01T00:00:00Z" },
+      "end": { "$date": "2024-04-05T23:59:59Z" }
+    },
+    "location": {
+      "address": "Jeju",
+      "latitude": 33.4996,
+      "longitude": 126.5312
+    },
+    "category": "Music Festival",
+    "websiteURL": "https://example.com/spring-music-festival",
+    "tags": ["music", "festival", "spring"],
+    "createdDate": { "$date": "2024-03-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba5" },
+    "name": "Autumn Harvest Fair",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71bac" },
+      { "$oid": "64dcc0a6f001b623d8a71bad" }
+    ],
+    "poster": "https://example.com/poster8.jpg",
+    "detailImages": [
+      "https://example.com/detail15.jpg",
+      "https://example.com/detail16.jpg"
+    ],
+    "fee": 800,
+    "operatingHours": {
+      "Monday": { "open": "09:00", "close": "17:00" },
+      "Tuesday": { "open": "09:00", "close": "17:00" },
+      "Wednesday": { "open": "09:00", "close": "17:00" },
+      "Thursday": { "open": "09:00", "close": "17:00" },
+      "Friday": { "open": "09:00", "close": "17:00" },
+      "Saturday": { "open": "09:00", "close": "17:00" },
+      "Sunday": { "open": "09:00", "close": "17:00" }
+    },
+    "sizeInfo": {
+      "width": "60m",
+      "height": "30m"
+    },
+    "description": "A fair celebrating the autumn harvest with food, games, and crafts.",
+    "dateRange": {
+      "start": { "$date": "2024-10-01T00:00:00Z" },
+      "end": { "$date": "2024-10-07T23:59:59Z" }
+    },
+    "location": {
+      "address": "Ulsan",
+      "latitude": 35.5384,
+      "longitude": 129.3114
+    },
+    "category": "Harvest Fair",
+    "websiteURL": "https://example.com/autumn-harvest-fair",
+    "tags": ["autumn", "harvest", "fair"],
+    "createdDate": { "$date": "2024-09-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba6" },
+    "name": "Book Lovers Expo",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71bae" },
+      { "$oid": "64dcc0a6f001b623d8a71baf" }
+    ],
+    "poster": "https://example.com/poster9.jpg",
+    "detailImages": [
+      "https://example.com/detail17.jpg",
+      "https://example.com/detail18.jpg"
+    ],
+    "fee": 500,
+    "operatingHours": {
+      "Monday": { "open": "09:00", "close": "18:00" },
+      "Tuesday": { "open": "09:00", "close": "18:00" },
+      "Wednesday": { "open": "09:00", "close": "18:00" },
+      "Thursday": { "open": "09:00", "close": "18:00" },
+      "Friday": { "open": "09:00", "close": "18:00" },
+      "Saturday": { "open": "09:00", "close": "18:00" },
+      "Sunday": { "open": "09:00", "close": "18:00" }
+    },
+    "sizeInfo": {
+      "width": "25m",
+      "height": "12m"
+    },
+    "description": "An expo for book lovers with author signings, readings, and book sales.",
+    "dateRange": {
+      "start": { "$date": "2024-11-01T00:00:00Z" },
+      "end": { "$date": "2024-11-10T23:59:59Z" }
+    },
+    "location": {
+      "address": "Seoul",
+      "latitude": 37.5665,
+      "longitude": 126.978
+    },
+    "category": "Book Expo",
+    "websiteURL": "https://example.com/book-lovers-expo",
+    "tags": ["books", "expo", "literature"],
+    "createdDate": { "$date": "2024-10-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba7" },
+    "name": "Science Fair",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71bb0" },
+      { "$oid": "64dcc0a6f001b623d8a71bb1" }
+    ],
+    "poster": "https://example.com/poster10.jpg",
+    "detailImages": [
+      "https://example.com/detail19.jpg",
+      "https://example.com/detail20.jpg"
+    ],
+    "fee": 1000,
+    "operatingHours": {
+      "Monday": { "open": "09:00", "close": "18:00" },
+      "Tuesday": { "open": "09:00", "close": "18:00" },
+      "Wednesday": { "open": "09:00", "close": "18:00" },
+      "Thursday": { "open": "09:00", "close": "18:00" },
+      "Friday": { "open": "09:00", "close": "18:00" },
+      "Saturday": { "open": "09:00", "close": "18:00" },
+      "Sunday": { "open": "09:00", "close": "18:00" }
+    },
+    "sizeInfo": {
+      "width": "30m",
+      "height": "15m"
+    },
+    "description": "A fair showcasing the latest discoveries and inventions in science.",
+    "dateRange": {
+      "start": { "$date": "2024-05-01T00:00:00Z" },
+      "end": { "$date": "2024-05-07T23:59:59Z" }
+    },
+    "location": {
+      "address": "Daegu",
+      "latitude": 35.8714,
+      "longitude": 128.6014
+    },
+    "category": "Science Fair",
+    "websiteURL": "https://example.com/science-fair",
+    "tags": ["science", "fair", "innovation"],
+    "createdDate": { "$date": "2024-04-01T10:00:00Z" }
+  },
+  {
+    "_id": { "$oid": "64dcbf56f001b623d8a71ba8" },
+    "name": "Fashion Week",
+    "reviewIds": [
+      { "$oid": "64dcc0a6f001b623d8a71bb2" },
+      { "$oid": "64dcc0a6f001b623d8a71bb3" }
+    ],
+    "poster": "https://example.com/poster11.jpg",
+    "detailImages": [
+      "https://example.com/detail21.jpg",
+      "https://example.com/detail22.jpg"
+    ],
+    "fee": 3500,
+    "operatingHours": {
+      "Monday": { "open": "09:00", "close": "22:00" },
+      "Tuesday": { "open": "09:00", "close": "22:00" },
+      "Wednesday": { "open": "09:00", "close": "22:00" },
+      "Thursday": { "open": "09:00", "close": "22:00" },
+      "Friday": { "open": "09:00", "close": "22:00" },
+      "Saturday": { "open": "09:00", "close": "22:00" },
+      "Sunday": { "open": "09:00", "close": "22:00" }
+    },
+    "sizeInfo": {
+      "width": "70m",
+      "height": "35m"
+    },
+    "description": "A week-long event showcasing the latest fashion trends.",
+    "dateRange": {
+      "start": { "$date": "2024-03-01T00:00:00Z" },
+      "end": { "$date": "2024-03-07T23:59:59Z" }
+    },
+    "location": {
+      "address": "Seoul",
+      "latitude": 37.5665,
+      "longitude": 126.978
+    },
+    "category": "Fashion Event",
+    "websiteURL": "https://example.com/fashion-week",
+    "tags": ["fashion", "event", "style"],
+    "createdDate": { "$date": "2024-02-01T10:00:00Z" }
+  }
+]
