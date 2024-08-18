@@ -1,28 +1,28 @@
+name: Deploy master branch
+
 on:
   push:
     branches:
       - develop
 
-name: Auto Deploy to AWS Lambda
-
 jobs:
   deploy:
-    name: Auto Deploy
+    name: deploy
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
-      - uses: actions/checkout@main
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: '18.x' (사용하는 node 버전)
-
-      - name: Install Dependencies
-        run: |
-          npm install -g serverless@3.39.0 
-          npm install
-      - name: Deploy to Lambda
-        run: sls deploy 
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - name: serverless deploy
+        uses: serverless/github-action@v3.2
+        with:
+          args: deploy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
