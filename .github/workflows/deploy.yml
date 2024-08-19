@@ -19,6 +19,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
+      - name: Create .env file
+        run: |
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+          echo "MONGODB_DBNAME=${{ secrets.MONGODB_DBNAME }}" >> .env
       - name: serverless deploy
         uses: serverless/github-action@v3.2
         with:

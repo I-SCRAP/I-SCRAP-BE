@@ -21,13 +21,19 @@
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/mapped-types": "*",
+    "@nestjs/mongoose": "^10.0.10",
     "@nestjs/platform-express": "^10.0.0",
     "@vendia/serverless-express": "^4.12.6",
     "aws-lambda": "^1.0.7",
+    "mongoose": "^8.5.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^13.6.0",
+    "serverless-plugin-optimize": "^4.2.1-rc.1",
     "serverless-plugin-typescript": "^2.1.5"
   },
   "devDependencies": {
