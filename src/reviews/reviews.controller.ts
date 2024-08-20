@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { validateRequiredField } from 'src/utils/validation-utils';
 
@@ -16,5 +16,11 @@ export class ReviewsController {
   getReviewById(@Param('reviewId') reviewId: string) {
     const userId = '66b4b5d2f9415815acd65e6a';
     return this.reviewsService.getReviewById(userId, reviewId);
+  }
+
+  @Delete(':reviewId')
+  deleteReview(@Param('reviewId') reviewId: string) {
+    const userId = '66b4b5d2f9415815acd65e6a';
+    return this.reviewsService.deleteReview(userId, reviewId);
   }
 }

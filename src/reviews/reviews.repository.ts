@@ -126,4 +126,15 @@ export class ReviewsRepository {
 
     return review[0];
   }
+
+  async deleteReview(userId: string, reviewId: string) {
+    const review = await this.reviewModel.findOneAndDelete({
+      _id: new ObjectId(reviewId),
+      userId: new ObjectId(userId),
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+  }
 }

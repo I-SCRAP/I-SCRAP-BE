@@ -14,4 +14,8 @@ export class ReviewsService {
     const review = await this.reviewsRepository.getReviewById(userId, reviewId);
     return review;
   }
+
+  async deleteReview(userId: string, reviewId: string) {
+    await this.reviewsRepository.deleteReview(userId, reviewId);
+  }
 }
