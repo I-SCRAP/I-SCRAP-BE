@@ -9,4 +9,9 @@ export class ReviewsService {
     const allReviews = await this.reviewsRepository.getAllReviews(userId, page);
     return allReviews;
   }
+
+  async getReviewById(userId: string, reviewId: string) {
+    const review = await this.reviewsRepository.getReviewById(userId, reviewId);
+    return review;
+  }
 }

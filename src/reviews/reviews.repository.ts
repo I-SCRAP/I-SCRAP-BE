@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -59,7 +59,7 @@ export class ReviewsRepository {
             },
           },
           title: 1,
-          shortComment: 1,
+          detailedReview: 1,
           cardFront: 1,
           popupName: '$popup.name',
         },
@@ -78,5 +78,52 @@ export class ReviewsRepository {
     ]);
 
     return allReviews;
+  }
+
+  async getReviewById(userId: string, reviewId: string) {
+    const review = await this.reviewModel.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(reviewId),
+          userId: new ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'popups',
+          localField: 'popupId',
+          foreignField: '_id',
+          as: 'popup',
+        },
+      },
+      {
+        $unwind: '$popup',
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          visitDate: {
+            $dateToString: {
+              format: '%Y.%m.%d',
+              date: '$visitDate',
+              timezone: '+09:00',
+            },
+          },
+          popupName: '$popup.name',
+          title: 1,
+          isPublic: 1,
+          detailedReview: 1,
+          cardFront: 1,
+          cardBack: 1,
+        },
+      },
+    ]);
+
+    if (!review.length) {
+      throw new NotFoundException('Review not found');
+    }
+
+    return review[0];
   }
 }
