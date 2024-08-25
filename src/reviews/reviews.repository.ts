@@ -148,4 +148,23 @@ export class ReviewsRepository {
       userId: new ObjectId(userId),
     });
   }
+
+  async updateReview(userId: string, reviewId: string, updateReviewDto: any) {
+    const review = await this.reviewModel.findOneAndUpdate(
+      {
+        _id: new ObjectId(reviewId),
+        userId: new ObjectId(userId),
+      },
+      {
+        $set: updateReviewDto,
+      },
+      {
+        new: true,
+      },
+    );
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+  }
 }

@@ -10,7 +10,13 @@ export const handler = async (event, context) => {
     console.log(event);
     const nestApp = await NestFactory.create(AppModule);
     nestApp.enableCors();
-    nestApp.useGlobalPipes(new ValidationPipe({ transform: true }));
+    nestApp.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
 
     await nestApp.init();
     cachedServer = serverlessExpress({

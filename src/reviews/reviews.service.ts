@@ -1,3 +1,4 @@
+import { UpdateReviewDto } from './dto/update-review.dto';
 import { Injectable } from '@nestjs/common';
 import { ReviewsRepository } from './reviews.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -22,5 +23,17 @@ export class ReviewsService {
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
     await this.reviewsRepository.createDefaultReview(userId, createReviewDto);
+  }
+
+  async updateReview(
+    userId: string,
+    reviewId: string,
+    UpdateReviewDto: UpdateReviewDto,
+  ) {
+    await this.reviewsRepository.updateReview(
+      userId,
+      reviewId,
+      UpdateReviewDto,
+    );
   }
 }
