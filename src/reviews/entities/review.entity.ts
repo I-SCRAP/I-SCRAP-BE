@@ -19,46 +19,46 @@ export class Review extends Document {
   @Prop({ type: Boolean, default: true })
   isPublic: boolean;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: '' })
   place: string;
 
   @Prop({ type: Date, required: true })
   visitDate: Date;
 
-  @Prop({ type: Number })
+  @Prop({ type: Number, default: 0 })
   amount: number;
 
-  @Prop({ type: [String] })
-  companions: string[];
+  @Prop({ type: String, default: '' })
+  companions: string;
 
-  @Prop({ type: Number, required: true })
+  @Prop({ type: Number, default: 5 })
   rating: number;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: '' })
   title: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   shortComment: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   detailedReview: string;
 
   @Prop({ type: String, required: true, enum: ['draft', 'published'] })
   status: string;
 
-  @Prop({ type: [String] })
+  @Prop({ type: [String], default: [] })
   photos: string[];
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   cardFront: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   cardBack: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   layout: string;
 
-  @Prop({ type: String })
+  @Prop({ type: String, default: '' })
   backgroundColor: string;
 
   @Prop({
@@ -74,6 +74,7 @@ export class Review extends Document {
         rotation: { type: String },
       },
     ],
+    default: [],
   })
   elements: {
     type: string;

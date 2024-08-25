@@ -3,6 +3,7 @@ import { Review } from './entities/review.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class ReviewsRepository {
@@ -18,6 +19,7 @@ export class ReviewsRepository {
       {
         $match: {
           userId: new ObjectId(userId),
+          status: 'published',
         },
       },
       {
@@ -136,5 +138,14 @@ export class ReviewsRepository {
     if (!review) {
       throw new NotFoundException('Review not found');
     }
+  }
+
+  async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
+    // [TODO] popupId가 존재하는지 확인, 존재하지 않으면 에러 발생
+
+    await this.reviewModel.create({
+      ...createReviewDto,
+      userId: new ObjectId(userId),
+    });
   }
 }

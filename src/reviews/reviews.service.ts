@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ReviewsRepository } from './reviews.repository';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -17,5 +18,9 @@ export class ReviewsService {
 
   async deleteReview(userId: string, reviewId: string) {
     await this.reviewsRepository.deleteReview(userId, reviewId);
+  }
+
+  async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
+    await this.reviewsRepository.createDefaultReview(userId, createReviewDto);
   }
 }
