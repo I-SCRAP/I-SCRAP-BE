@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@vendia/serverless-express": "^4.12.6",
     "aws-lambda": "^1.0.7",
+    "mongodb": "^6.8.0",
     "mongoose": "^8.5.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
