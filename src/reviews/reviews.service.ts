@@ -39,6 +39,14 @@ export class ReviewsService {
     );
   }
 
+  async getTextReview(userId: string, reviewId: string) {
+    const textReview = await this.reviewsRepository.getTextReview(
+      userId,
+      reviewId,
+    );
+    return textReview;
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     await this.reviewsRepository.createComment(userId, createCommentDto);
   }

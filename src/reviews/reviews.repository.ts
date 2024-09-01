@@ -180,6 +180,75 @@ export class ReviewsRepository {
     }
   }
 
+  async getTextReview(userId: string, reviewId: string) {
+    const textReview = await this.reviewModel.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(reviewId),
+          userId: new ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'popups',
+          localField: 'popupId',
+          foreignField: '_id',
+          as: 'popup',
+        },
+      },
+      {
+        $unwind: '$popup',
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          title: 1,
+          shortComment: 1,
+          detailedReview: 1,
+          rating: 1,
+          photos: 1,
+          cardFront: 1,
+          cardBack: 1,
+          visitDate: {
+            $dateToString: {
+              format: '%Y.%m.%d',
+              date: '$visitDate',
+              timezone: '+09:00',
+            },
+          },
+          popup: {
+            id: '$popup._id',
+            name: '$popup.name',
+            location: '$popup.location.address',
+          },
+          user: {
+            id: '$user._id',
+            name: '$user.name',
+            profileImage: '$user.profileImage',
+          },
+        },
+      },
+    ]);
+
+    if (textReview.length === 0) {
+      throw new NotFoundException('Review not found');
+    }
+
+    return textReview[0];
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     const review = await this.reviewModel.findOne({
       _id: createCommentDto.reviewId,
