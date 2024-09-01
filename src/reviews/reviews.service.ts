@@ -1,7 +1,10 @@
+import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Injectable } from '@nestjs/common';
 import { ReviewsRepository } from './reviews.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -35,5 +38,45 @@ export class ReviewsService {
       reviewId,
       UpdateReviewDto,
     );
+  }
+
+  async getTextReview(userId: string, reviewId: string) {
+    const textReview = await this.reviewsRepository.getTextReview(
+      userId,
+      reviewId,
+    );
+    return textReview;
+  }
+
+  async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {
+    await this.reviewsRepository.likeReview(userId, createReviewLikeDto);
+  }
+
+  async getReviewLikes(reviewId: string) {
+    const likes = await this.reviewsRepository.getReviewLikes(reviewId);
+    return likes;
+  }
+
+  async unlikeReview(userId: string, reviewId: string) {
+    await this.reviewsRepository.unlikeReview(userId, reviewId);
+  }
+
+  async createComment(userId: string, createCommentDto: CreateCommentDto) {
+    await this.reviewsRepository.createComment(userId, createCommentDto);
+  }
+
+  async createSubComment(
+    userId: string,
+    createSubCommentDto: CreateSubCommentDto,
+  ) {
+    await this.reviewsRepository.createSubComment(userId, createSubCommentDto);
+  }
+
+  async getAllComments(userId: string, reviewId: string) {
+    const comments = await this.reviewsRepository.getAllComments(
+      userId,
+      reviewId,
+    );
+    return comments;
   }
 }
