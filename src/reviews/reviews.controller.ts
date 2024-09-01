@@ -12,6 +12,8 @@ import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { validateRequiredField } from '../utils/validation-utils';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -48,5 +50,17 @@ export class ReviewsController {
   ) {
     const userId = '66b4b5d2f9415815acd65e6a';
     return this.reviewsService.updateReview(userId, reviewId, updateReviewDto);
+  }
+
+  @Post('comment')
+  createComment(@Body() createCommentDto: CreateCommentDto) {
+    const userId = '66b4b5d2f9415815acd65e6a';
+    return this.reviewsService.createComment(userId, createCommentDto);
+  }
+
+  @Post('sub-comment')
+  createSubComment(@Body() createSubCommentDto: CreateSubCommentDto) {
+    const userId = '66b4b5d2f9415815acd65e6a';
+    return this.reviewsService.createSubComment(userId, createSubCommentDto);
   }
 }
