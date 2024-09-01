@@ -64,4 +64,26 @@ export class BookmarksRepository {
 
     return bookmarks.map((bookmark) => bookmark.popupId.toString());
   }
+
+  // 여러 팝업에 대해 북마크를 제거하는 메서드
+  async unbookmarkPopups(userId: string, popupIds: string[]): Promise<void> {
+    if (popupIds.length === 0) {
+      return; // 리스트가 비어있으면 아무 작업도 하지 않음
+    }
+
+    // ObjectId로 변환
+    const objectIds = popupIds.map((id) => new ObjectId(id));
+
+    // 여러 팝업에 대한 북마크를 삭제
+    const result = await this.bookmarkModel
+      .deleteMany({
+        userId: new ObjectId(userId),
+        popupId: { $in: objectIds },
+      })
+      .exec();
+
+    if (result.deletedCount === 0) {
+      throw new Error('No bookmarks found to delete');
+    }
+  }
 }

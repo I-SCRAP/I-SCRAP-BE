@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { Popup } from 'src/popups/entities/popup.entity';
 
@@ -18,5 +18,18 @@ export class BookmarksController {
   @Get('popups')
   async getBookmarkedPopups(@Query('userId') userId: string): Promise<Popup[]> {
     return this.bookmarkService.getBookmarkedPopups(userId);
+  }
+
+  @Post('unbookmark')
+  async unbookmarkPopups(
+    @Query('userId') userId: string,
+    @Body('popupIds') popupIds: string[],
+  ): Promise<{ message: string }> {
+    if (!popupIds || popupIds.length === 0) {
+      return { message: 'No popup IDs provided' };
+    }
+
+    await this.bookmarkService.unbookmarkPopups(userId, popupIds);
+    return { message: 'Bookmarks removed successfully' };
   }
 }

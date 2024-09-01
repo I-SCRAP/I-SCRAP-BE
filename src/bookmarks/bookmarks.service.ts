@@ -26,4 +26,13 @@ export class BookmarksService {
     // 2. 해당 popupId 목록으로 팝업 상세 정보 조회
     return this.popupsRepository.findPopupsByIds(popupIds);
   }
+
+  // 여러 팝업의 북마크를 해제하는 메서드
+  async unbookmarkPopups(userId: string, popupIds: string[]): Promise<void> {
+    if (popupIds.length === 0) {
+      return; // 리스트가 비어있으면 아무 작업도 하지 않음
+    }
+
+    await this.bookmarksRepository.unbookmarkPopups(userId, popupIds);
+  }
 }
