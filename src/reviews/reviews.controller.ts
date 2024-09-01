@@ -63,4 +63,10 @@ export class ReviewsController {
     const userId = '66b4b5d2f9415815acd65e6a';
     return this.reviewsService.createSubComment(userId, createSubCommentDto);
   }
+
+  @Get(':reviewId/comments')
+  getAllComments(@Param('reviewId') reviewId: string) {
+    const userId = '66b4b5d2f9415815acd65e6a';
+    return this.reviewsService.getAllComments(userId, reviewId);
+  }
 }

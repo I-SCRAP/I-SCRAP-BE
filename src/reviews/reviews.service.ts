@@ -49,4 +49,12 @@ export class ReviewsService {
   ) {
     await this.reviewsRepository.createSubComment(userId, createSubCommentDto);
   }
+
+  async getAllComments(userId: string, reviewId: string) {
+    const comments = await this.reviewsRepository.getAllComments(
+      userId,
+      reviewId,
+    );
+    return comments;
+  }
 }

@@ -211,4 +211,129 @@ export class ReviewsRepository {
       authorId: new ObjectId(userId),
     });
   }
+
+  async getAllComments(userId: string, reviewId: string) {
+    const comments = await this.commentModel.aggregate([
+      {
+        $match: {
+          reviewId: new ObjectId(reviewId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'authorId',
+          foreignField: '_id',
+          as: 'author',
+        },
+      },
+      {
+        $unwind: {
+          path: '$author',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'subComments',
+          localField: '_id',
+          foreignField: 'commentId',
+          as: 'subComments',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'subComments.authorId',
+          foreignField: '_id',
+          as: 'subCommentsAuthors',
+        },
+      },
+      {
+        $addFields: {
+          subComments: {
+            $map: {
+              input: '$subComments',
+              as: 'subComment',
+              in: {
+                _id: '$$subComment._id',
+                authorId: '$$subComment.authorId',
+                contents: '$$subComment.contents',
+                createdDate: '$$subComment.createdDate',
+                author: {
+                  $arrayElemAt: [
+                    '$subCommentsAuthors',
+                    {
+                      $indexOfArray: [
+                        '$subCommentsAuthors._id',
+                        '$$subComment.authorId',
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          subComments: {
+            $map: {
+              input: {
+                $sortArray: {
+                  input: '$subComments',
+                  sortBy: { createdDate: 1 },
+                },
+              },
+              as: 'subComment',
+              in: '$$subComment',
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          contents: 1,
+          createdDate: 1,
+          author: {
+            id: '$author._id',
+            name: '$author.name',
+            profileImage: '$author.profileImage',
+          },
+          subComments: {
+            $cond: {
+              if: { $gt: [{ $size: '$subComments' }, 0] },
+              then: {
+                $map: {
+                  input: '$subComments',
+                  as: 'subComment',
+                  in: {
+                    id: '$$subComment._id',
+                    author: {
+                      id: '$$subComment.author._id',
+                      name: '$$subComment.author.name',
+                      profileImage: '$$subComment.author.profileImage',
+                    },
+                    contents: '$$subComment.contents',
+                    createdDate: '$$subComment.createdDate',
+                  },
+                },
+              },
+              else: [],
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          createdDate: 1,
+        },
+      },
+    ]);
+
+    return comments;
+  }
 }

@@ -1,11 +1,10 @@
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString, IsMongoId } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 export class CreateCommentDto {
-  @IsMongoId()
   @IsNotEmpty()
-  @Type(() => ObjectId)
+  @Transform(({ value }) => new ObjectId(value))
   reviewId: ObjectId;
 
   @IsString()
