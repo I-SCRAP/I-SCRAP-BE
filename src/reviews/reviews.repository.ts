@@ -281,6 +281,54 @@ export class ReviewsRepository {
     });
   }
 
+  async getReviewLikes(reviewId: string) {
+    const review = await this.reviewModel.findOne({
+      _id: new ObjectId(reviewId),
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const likes = await this.reviewLikeModel.aggregate([
+      {
+        $match: {
+          reviewId: new ObjectId(reviewId),
+        },
+      },
+      {
+        $group: {
+          _id: '$type',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          type: '$_id',
+          count: 1,
+        },
+      },
+    ]);
+
+    const likeTypes = [
+      'Amazing',
+      'Like',
+      'Surprising',
+      'Impressive',
+      'Relatable',
+    ];
+
+    likeTypes.forEach((type) => {
+      const fullTypeLike = likes.find((like) => like.type === type);
+      if (!fullTypeLike) {
+        likes.push({ type, count: 0 });
+      }
+    });
+
+    return likes;
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     const review = await this.reviewModel.findOne({
       _id: createCommentDto.reviewId,

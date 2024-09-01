@@ -52,6 +52,11 @@ export class ReviewsService {
     await this.reviewsRepository.likeReview(userId, createReviewLikeDto);
   }
 
+  async getReviewLikes(reviewId: string) {
+    const likes = await this.reviewsRepository.getReviewLikes(reviewId);
+    return likes;
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     await this.reviewsRepository.createComment(userId, createCommentDto);
   }
