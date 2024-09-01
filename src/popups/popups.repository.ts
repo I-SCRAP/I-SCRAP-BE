@@ -18,25 +18,10 @@ export class PopupsRepository {
         },
       },
       {
-        $lookup: {
-          from: 'reviews',
-          localField: '_id',
-          foreignField: 'popupId',
-          as: 'reviews',
-        },
-      },
-      {
         $project: {
           _id: 0,
           id: '$_id',
           name: 1,
-          reviewIds: {
-            $map: {
-              input: '$reviews._id',
-              as: 'review',
-              in: '$$review',
-            },
-          },
           poster: 1,
           detailImages: 1,
           fee: 1,
@@ -51,12 +36,17 @@ export class PopupsRepository {
           },
           category: 1,
           websiteURL: 1,
-          tags: 1,
           createdDate: 1,
         },
       },
     ]);
 
     return popupDetail.length > 0 ? popupDetail[0] : null;
+  }
+
+  // 특정 popupId 목록에 대한 팝업 상세 정보 조회
+  async findPopupsByIds(popupIds: string[]): Promise<Popup[]> {
+    const objectIds = popupIds.map((id) => new ObjectId(id));
+    return this.popupModel.find({ _id: { $in: objectIds } }).exec();
   }
 }

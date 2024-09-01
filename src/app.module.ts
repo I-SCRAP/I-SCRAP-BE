@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { ReviewsModule } from './reviews/reviews.module';
 import { PopupsModule } from './popups/popups.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PopupsModule } from './popups/popups.module';
     }),
     ReviewsModule,
     PopupsModule,
+    BookmarksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
