@@ -18,6 +18,14 @@ export class PopupsRepository {
         },
       },
       {
+        $lookup: {
+          from: 'reviews', // 리뷰 컬렉션의 이름
+          localField: '_id', // 팝업의 _id 필드
+          foreignField: 'popupId', // 리뷰에서 팝업과 연결된 필드
+          as: 'reviews', // 결과에 포함될 리뷰 필드 이름
+        },
+      },
+      {
         $project: {
           _id: 0,
           id: '$_id',
@@ -37,6 +45,18 @@ export class PopupsRepository {
           category: 1,
           websiteURL: 1,
           createdDate: 1,
+          reviews: {
+            _id: 1,
+            userId: 1,
+            visitDate: 1,
+            rating: 1,
+            title: 1,
+            shortComment: 1,
+            detailedReview: 1,
+            photos: 1,
+            status: 1,
+            createdDate: 1,
+          },
         },
       },
     ]);

@@ -13,9 +13,6 @@ export class Popup extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ type: [ObjectId], ref: 'Review' })
-  reviewIds: string[];
-
   @Prop()
   poster: string;
 
@@ -78,9 +75,6 @@ export class Popup extends Document {
 
   @Prop()
   websiteURL: string;
-
-  @Prop([String])
-  tags: string[];
 
   @Prop({ default: Date.now })
   createdDate: Date;
