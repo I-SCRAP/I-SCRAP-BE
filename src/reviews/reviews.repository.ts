@@ -329,6 +329,30 @@ export class ReviewsRepository {
     return likes;
   }
 
+  async unlikeReview(userId: string, reviewId: string) {
+    const review = await this.reviewModel.findOne({
+      _id: new ObjectId(reviewId),
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const like = await this.reviewLikeModel.findOne({
+      reviewId: new ObjectId(reviewId),
+      userId: new ObjectId(userId),
+    });
+
+    if (!like) {
+      throw new NotFoundException('Like not found');
+    }
+
+    await this.reviewLikeModel.findOneAndDelete({
+      reviewId: new ObjectId(reviewId),
+      userId: new ObjectId(userId),
+    });
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     const review = await this.reviewModel.findOne({
       _id: createCommentDto.reviewId,

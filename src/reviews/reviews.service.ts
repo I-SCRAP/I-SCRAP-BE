@@ -57,6 +57,10 @@ export class ReviewsService {
     return likes;
   }
 
+  async unlikeReview(userId: string, reviewId: string) {
+    await this.reviewsRepository.unlikeReview(userId, reviewId);
+  }
+
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
     await this.reviewsRepository.createComment(userId, createCommentDto);
   }

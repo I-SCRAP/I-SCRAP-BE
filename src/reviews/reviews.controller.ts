@@ -37,6 +37,12 @@ export class ReviewsController {
     return this.reviewsService.getReviewLikes(reviewId);
   }
 
+  @Delete(':reviewId/likes')
+  unlikeReview(@Param('reviewId') reviewId: string) {
+    const userId = '64dcc0e7f001b623d8a71ba2';
+    return this.reviewsService.unlikeReview(userId, reviewId);
+  }
+
   @Get(':reviewId')
   getReviewById(@Param('reviewId') reviewId: string) {
     const userId = '66b4b5d2f9415815acd65e6a';
