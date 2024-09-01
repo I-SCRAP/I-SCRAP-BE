@@ -1,3 +1,4 @@
+import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Injectable } from '@nestjs/common';
 import { ReviewsRepository } from './reviews.repository';
@@ -45,6 +46,10 @@ export class ReviewsService {
       reviewId,
     );
     return textReview;
+  }
+
+  async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {
+    await this.reviewsRepository.likeReview(userId, createReviewLikeDto);
   }
 
   async createComment(userId: string, createCommentDto: CreateCommentDto) {

@@ -14,6 +14,7 @@ import { validateRequiredField } from '../utils/validation-utils';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
+import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -23,6 +24,12 @@ export class ReviewsController {
     validateRequiredField('page', page);
     const userId = '66b4b5d2f9415815acd65e6a';
     return this.reviewsService.getAllReviews(userId, page);
+  }
+
+  @Post('likes')
+  likeReview(@Body() createReviewLikeDto: CreateReviewLikeDto) {
+    const userId = '64dcc0e7f001b623d8a71ba2';
+    return this.reviewsService.likeReview(userId, createReviewLikeDto);
   }
 
   @Get(':reviewId')

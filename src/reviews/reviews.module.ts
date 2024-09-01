@@ -5,7 +5,8 @@ import { ReviewsRepository } from './reviews.repository';
 import { Review, ReviewSchema } from './entities/review.entity';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './entities/comment.entity';
-import { SubComment, SubCommentSchema } from './entities/subComment.entity';
+import { SubComment, SubCommentSchema } from './entities/sub-comment.entity';
+import { ReviewLike, ReviewLikeSchema } from './entities/review-like.entity';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SubComment, SubCommentSchema } from './entities/subComment.entity';
       { name: Review.name, schema: ReviewSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: SubComment.name, schema: SubCommentSchema },
+      { name: ReviewLike.name, schema: ReviewLikeSchema },
     ]),
   ],
   controllers: [ReviewsController],

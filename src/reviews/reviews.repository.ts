@@ -1,14 +1,20 @@
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Review } from './entities/review.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { Comment } from './entities/comment.entity';
-import { SubComment } from './entities/subComment.entity';
+import { SubComment } from './entities/sub-comment.entity';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateReviewLikeDto } from './dto/create-review-like.dto';
+import { ReviewLike } from './entities/review-like.entity';
 
 @Injectable()
 export class ReviewsRepository {
@@ -17,6 +23,8 @@ export class ReviewsRepository {
     @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
     @InjectModel(SubComment.name)
     private readonly subCommentModel: Model<SubComment>,
+    @InjectModel(ReviewLike.name)
+    private readonly reviewLikeModel: Model<ReviewLike>,
   ) {}
 
   async getAllReviews(userId: string, page: number) {
@@ -247,6 +255,30 @@ export class ReviewsRepository {
     }
 
     return textReview[0];
+  }
+
+  async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {
+    const review = await this.reviewModel.findOne({
+      _id: createReviewLikeDto.reviewId,
+    });
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const like = await this.reviewLikeModel.findOne({
+      reviewId: createReviewLikeDto.reviewId,
+      userId: new ObjectId(userId),
+    });
+
+    if (like) {
+      throw new ConflictException('Already liked');
+    }
+
+    await this.reviewLikeModel.create({
+      ...createReviewLikeDto,
+      userId: new ObjectId(userId),
+    });
   }
 
   async createComment(userId: string, createCommentDto: CreateCommentDto) {
