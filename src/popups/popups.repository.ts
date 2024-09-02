@@ -19,10 +19,10 @@ export class PopupsRepository {
       },
       {
         $lookup: {
-          from: 'reviews',
-          localField: '_id',
-          foreignField: 'popupId',
-          as: 'reviews',
+          from: 'reviews', // 리뷰 컬렉션의 이름
+          localField: '_id', // 팝업의 _id 필드
+          foreignField: 'popupId', // 리뷰에서 팝업과 연결된 필드
+          as: 'reviews', // 결과에 포함될 리뷰 필드 이름
         },
       },
       {
@@ -30,13 +30,6 @@ export class PopupsRepository {
           _id: 0,
           id: '$_id',
           name: 1,
-          reviewIds: {
-            $map: {
-              input: '$reviews._id',
-              as: 'review',
-              in: '$$review',
-            },
-          },
           poster: 1,
           detailImages: 1,
           fee: 1,
@@ -51,12 +44,29 @@ export class PopupsRepository {
           },
           category: 1,
           websiteURL: 1,
-          tags: 1,
           createdDate: 1,
+          reviews: {
+            _id: 1,
+            userId: 1,
+            visitDate: 1,
+            rating: 1,
+            title: 1,
+            shortComment: 1,
+            detailedReview: 1,
+            photos: 1,
+            status: 1,
+            createdDate: 1,
+          },
         },
       },
     ]);
 
     return popupDetail.length > 0 ? popupDetail[0] : null;
+  }
+
+  // 특정 popupId 목록에 대한 팝업 상세 정보 조회
+  async findPopupsByIds(popupIds: string[]): Promise<Popup[]> {
+    const objectIds = popupIds.map((id) => new ObjectId(id));
+    return this.popupModel.find({ _id: { $in: objectIds } }).exec();
   }
 }
