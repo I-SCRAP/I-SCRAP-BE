@@ -160,6 +160,7 @@ export class ReviewsRepository {
 
     await this.reviewModel.create({
       ...createReviewDto,
+      cardFront: createReviewDto.cardImage,
       userId: new ObjectId(userId),
     });
   }
@@ -255,6 +256,60 @@ export class ReviewsRepository {
     }
 
     return textReview[0];
+  }
+
+  async getCardReview(userId: string, reviewId: string) {
+    const cardReview = await this.reviewModel.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(reviewId),
+          userId: new ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'popups',
+          localField: 'popupId',
+          foreignField: '_id',
+          as: 'popup',
+        },
+      },
+      {
+        $unwind: '$popup',
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          rating: 1,
+          layout: 1,
+          backgroundColor: 1,
+          cardImage: 1,
+          place: 1,
+          amount: 1,
+          companions: 1,
+          visitDate: {
+            $dateToString: {
+              format: '%Y.%m.%d',
+              date: '$visitDate',
+              timezone: '+09:00',
+            },
+          },
+          popup: {
+            id: '$popup._id',
+            name: '$popup.name',
+          },
+          elements: 1,
+          isPublic: 1,
+        },
+      },
+    ]);
+
+    if (cardReview.length === 0) {
+      throw new NotFoundException('Review not found');
+    }
+
+    return cardReview[0];
   }
 
   async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {

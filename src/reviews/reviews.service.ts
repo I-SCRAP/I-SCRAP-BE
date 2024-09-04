@@ -48,6 +48,14 @@ export class ReviewsService {
     return textReview;
   }
 
+  async getCardReview(userId: string, reviewId: string) {
+    const cardReview = await this.reviewsRepository.getCardReview(
+      userId,
+      reviewId,
+    );
+    return cardReview;
+  }
+
   async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {
     await this.reviewsRepository.likeReview(userId, createReviewLikeDto);
   }

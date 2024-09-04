@@ -58,6 +58,9 @@ export class Review extends Document {
   @Prop({ type: String, default: '' })
   backgroundColor: string;
 
+  @Prop({ type: String, default: '' })
+  cardImage: string;
+
   @Prop({
     type: [
       {
