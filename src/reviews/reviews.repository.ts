@@ -18,6 +18,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { ReviewLike } from './entities/review-like.entity';
 import { DeleteReviewsDto } from './dto/delete-reviews.dto';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class ReviewsRepository {
@@ -28,6 +29,7 @@ export class ReviewsRepository {
     private readonly subCommentModel: Model<SubComment>,
     @InjectModel(ReviewLike.name)
     private readonly reviewLikeModel: Model<ReviewLike>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async getAllReviews(userId: string, page: number) {
@@ -96,6 +98,19 @@ export class ReviewsRepository {
       },
     ]);
 
+    allReviews.forEach(async (review) => {
+      review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardFront,
+      );
+      review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardBack,
+      );
+    });
+
     return allReviews;
   }
 
@@ -144,6 +159,18 @@ export class ReviewsRepository {
       throw new NotFoundException('Review not found');
     }
 
+    review[0].cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review[0].cardFront,
+    );
+
+    review[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review[0].cardBack,
+    );
+
     return review[0];
   }
 
@@ -156,6 +183,9 @@ export class ReviewsRepository {
     if (!review) {
       throw new NotFoundException('Review not found');
     }
+
+    // [TODO] 리뷰에 연결된 댓글, 대댓글, 좋아요 삭제
+    // [TODO] 리뷰에 연결된 사진 삭제
   }
 
   async deleteReviews(userId: string, deleteReviewsDto: DeleteReviewsDto) {
@@ -176,6 +206,9 @@ export class ReviewsRepository {
     if (reviews.deletedCount !== deleteReviewsDto.reviewIds.length) {
       throw new InternalServerErrorException('Error during deletion');
     }
+
+    // [TODO] 리뷰에 연결된 댓글, 대댓글, 좋아요 삭제
+    // [TODO] 리뷰에 연결된 사진 삭제
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
@@ -278,6 +311,28 @@ export class ReviewsRepository {
       throw new NotFoundException('Review not found');
     }
 
+    textReview[0].cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview[0].cardFront,
+    );
+
+    textReview[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview[0].cardBack,
+    );
+
+    textReview[0].photos = await Promise.all(
+      textReview[0].photos.map((photo) =>
+        this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          photo,
+        ),
+      ),
+    );
+
     return textReview[0];
   }
 
@@ -331,6 +386,12 @@ export class ReviewsRepository {
     if (cardReview.length === 0) {
       throw new NotFoundException('Review not found');
     }
+
+    cardReview[0].cardImage = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      cardReview[0].cardImage,
+    );
 
     return cardReview[0];
   }

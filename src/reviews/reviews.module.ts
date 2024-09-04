@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './entities/comment.entity';
 import { SubComment, SubCommentSchema } from './entities/sub-comment.entity';
 import { ReviewLike, ReviewLikeSchema } from './entities/review-like.entity';
+import { S3Service } from 'src/s3/s3.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { ReviewLike, ReviewLikeSchema } from './entities/review-like.entity';
     ]),
   ],
   controllers: [ReviewsController],
-  providers: [ReviewsService, ReviewsRepository],
+  providers: [ReviewsService, ReviewsRepository, S3Service],
 })
 export class ReviewsModule {}
