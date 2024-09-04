@@ -133,6 +133,7 @@ export class ReviewsRepository {
           detailedReview: 1,
           cardFront: 1,
           cardBack: 1,
+          shortComment: 1,
         },
       },
     ]);
