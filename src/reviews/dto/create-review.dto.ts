@@ -24,7 +24,4 @@ export class CreateReviewDto {
 
   @IsBoolean()
   isPublic: boolean;
-
-  @IsString()
-  status: string;
 }

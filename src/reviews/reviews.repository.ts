@@ -35,7 +35,6 @@ export class ReviewsRepository {
       {
         $match: {
           userId: new ObjectId(userId),
-          status: 'published',
         },
       },
       {

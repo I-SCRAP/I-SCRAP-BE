@@ -43,9 +43,6 @@ export class Review extends Document {
   @Prop({ type: String, default: '' })
   detailedReview: string;
 
-  @Prop({ type: String, required: true, enum: ['draft', 'published'] })
-  status: string;
-
   @Prop({ type: [String], default: [] })
   photos: string[];
 
