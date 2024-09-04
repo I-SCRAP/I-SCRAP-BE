@@ -11,8 +11,12 @@ import { DeleteReviewsDto } from './dto/delete-reviews.dto';
 export class ReviewsService {
   constructor(private readonly reviewsRepository: ReviewsRepository) {}
 
-  async getAllReviews(userId: string, page: number) {
-    const allReviews = await this.reviewsRepository.getAllReviews(userId, page);
+  async getAllReviews(userId: string, page: string) {
+    const pageNumber = parseInt(page, 10);
+    const allReviews = await this.reviewsRepository.getAllReviews(
+      userId,
+      pageNumber,
+    );
     return allReviews;
   }
 
