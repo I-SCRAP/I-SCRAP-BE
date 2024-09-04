@@ -15,6 +15,7 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
+import { DeleteReviewsDto } from './dto/delete-reviews.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -53,6 +54,12 @@ export class ReviewsController {
   deleteReview(@Param('reviewId') reviewId: string) {
     const userId = '66b4b5d2f9415815acd65e6a';
     return this.reviewsService.deleteReview(userId, reviewId);
+  }
+
+  @Delete()
+  deleteReviews(@Body() deleteReviewsDto: DeleteReviewsDto) {
+    const userId = '66b4b5d2f9415815acd65e6a';
+    return this.reviewsService.deleteReviews(userId, deleteReviewsDto);
   }
 
   @Post()

@@ -5,6 +5,7 @@ import { ReviewsRepository } from './reviews.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
+import { DeleteReviewsDto } from './dto/delete-reviews.dto';
 
 @Injectable()
 export class ReviewsService {
@@ -22,6 +23,10 @@ export class ReviewsService {
 
   async deleteReview(userId: string, reviewId: string) {
     await this.reviewsRepository.deleteReview(userId, reviewId);
+  }
+
+  async deleteReviews(userId: string, deleteReviewsDto: DeleteReviewsDto) {
+    await this.reviewsRepository.deleteReviews(userId, deleteReviewsDto);
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {

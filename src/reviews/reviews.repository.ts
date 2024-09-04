@@ -1,7 +1,9 @@
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Review } from './entities/review.entity';
@@ -15,6 +17,7 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { ReviewLike } from './entities/review-like.entity';
+import { DeleteReviewsDto } from './dto/delete-reviews.dto';
 
 @Injectable()
 export class ReviewsRepository {
@@ -152,6 +155,26 @@ export class ReviewsRepository {
 
     if (!review) {
       throw new NotFoundException('Review not found');
+    }
+  }
+
+  async deleteReviews(userId: string, deleteReviewsDto: DeleteReviewsDto) {
+    const validReviewIds = await this.reviewModel.find({
+      _id: { $in: deleteReviewsDto.reviewIds },
+      userId: new ObjectId(userId),
+    });
+
+    if (validReviewIds.length !== deleteReviewsDto.reviewIds.length) {
+      throw new BadRequestException('Some review IDs do not exist.');
+    }
+
+    const reviews = await this.reviewModel.deleteMany({
+      _id: { $in: deleteReviewsDto.reviewIds },
+      userId: new ObjectId(userId),
+    });
+
+    if (reviews.deletedCount !== deleteReviewsDto.reviewIds.length) {
+      throw new InternalServerErrorException('Error during deletion');
     }
   }
 
