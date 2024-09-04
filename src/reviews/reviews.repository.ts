@@ -77,7 +77,6 @@ export class ReviewsRepository {
             },
           },
           title: 1,
-          detailedReview: 1,
           cardFront: 1,
           popupName: '$popup.name',
         },
