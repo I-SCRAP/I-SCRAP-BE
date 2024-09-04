@@ -245,6 +245,7 @@ export class ReviewsRepository {
             name: '$user.name',
             profileImage: '$user.profileImage',
           },
+          isPublic: 1,
         },
       },
     ]);
