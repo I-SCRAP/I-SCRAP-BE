@@ -54,7 +54,6 @@ export class PopupsRepository {
             shortComment: 1,
             detailedReview: 1,
             photos: 1,
-            status: 1,
             createdDate: 1,
           },
         },
