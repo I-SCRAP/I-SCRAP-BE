@@ -1,7 +1,9 @@
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Review } from './entities/review.entity';
@@ -15,6 +17,8 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { ReviewLike } from './entities/review-like.entity';
+import { DeleteReviewsDto } from './dto/delete-reviews.dto';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class ReviewsRepository {
@@ -25,6 +29,7 @@ export class ReviewsRepository {
     private readonly subCommentModel: Model<SubComment>,
     @InjectModel(ReviewLike.name)
     private readonly reviewLikeModel: Model<ReviewLike>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async getAllReviews(userId: string, page: number) {
@@ -35,7 +40,6 @@ export class ReviewsRepository {
       {
         $match: {
           userId: new ObjectId(userId),
-          status: 'published',
         },
       },
       {
@@ -77,7 +81,6 @@ export class ReviewsRepository {
             },
           },
           title: 1,
-          detailedReview: 1,
           cardFront: 1,
           popupName: '$popup.name',
         },
@@ -94,6 +97,19 @@ export class ReviewsRepository {
         $limit: pageSize,
       },
     ]);
+
+    allReviews.forEach(async (review) => {
+      review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardFront,
+      );
+      review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardBack,
+      );
+    });
 
     return allReviews;
   }
@@ -134,6 +150,7 @@ export class ReviewsRepository {
           detailedReview: 1,
           cardFront: 1,
           cardBack: 1,
+          shortComment: 1,
         },
       },
     ]);
@@ -141,6 +158,18 @@ export class ReviewsRepository {
     if (!review.length) {
       throw new NotFoundException('Review not found');
     }
+
+    review[0].cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review[0].cardFront,
+    );
+
+    review[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review[0].cardBack,
+    );
 
     return review[0];
   }
@@ -154,6 +183,32 @@ export class ReviewsRepository {
     if (!review) {
       throw new NotFoundException('Review not found');
     }
+
+    // [TODO] 리뷰에 연결된 댓글, 대댓글, 좋아요 삭제
+    // [TODO] 리뷰에 연결된 사진 삭제
+  }
+
+  async deleteReviews(userId: string, deleteReviewsDto: DeleteReviewsDto) {
+    const validReviewIds = await this.reviewModel.find({
+      _id: { $in: deleteReviewsDto.reviewIds },
+      userId: new ObjectId(userId),
+    });
+
+    if (validReviewIds.length !== deleteReviewsDto.reviewIds.length) {
+      throw new BadRequestException('Some review IDs do not exist.');
+    }
+
+    const reviews = await this.reviewModel.deleteMany({
+      _id: { $in: deleteReviewsDto.reviewIds },
+      userId: new ObjectId(userId),
+    });
+
+    if (reviews.deletedCount !== deleteReviewsDto.reviewIds.length) {
+      throw new InternalServerErrorException('Error during deletion');
+    }
+
+    // [TODO] 리뷰에 연결된 댓글, 대댓글, 좋아요 삭제
+    // [TODO] 리뷰에 연결된 사진 삭제
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
@@ -161,6 +216,7 @@ export class ReviewsRepository {
 
     await this.reviewModel.create({
       ...createReviewDto,
+      cardFront: createReviewDto.cardImage,
       userId: new ObjectId(userId),
     });
   }
@@ -246,6 +302,7 @@ export class ReviewsRepository {
             name: '$user.name',
             profileImage: '$user.profileImage',
           },
+          isPublic: 1,
         },
       },
     ]);
@@ -254,7 +311,89 @@ export class ReviewsRepository {
       throw new NotFoundException('Review not found');
     }
 
+    textReview[0].cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview[0].cardFront,
+    );
+
+    textReview[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview[0].cardBack,
+    );
+
+    textReview[0].photos = await Promise.all(
+      textReview[0].photos.map((photo) =>
+        this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          photo,
+        ),
+      ),
+    );
+
     return textReview[0];
+  }
+
+  async getCardReview(userId: string, reviewId: string) {
+    const cardReview = await this.reviewModel.aggregate([
+      {
+        $match: {
+          _id: new ObjectId(reviewId),
+          userId: new ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'popups',
+          localField: 'popupId',
+          foreignField: '_id',
+          as: 'popup',
+        },
+      },
+      {
+        $unwind: '$popup',
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          rating: 1,
+          layout: 1,
+          backgroundColor: 1,
+          cardImage: 1,
+          place: 1,
+          amount: 1,
+          companions: 1,
+          visitDate: {
+            $dateToString: {
+              format: '%Y.%m.%d',
+              date: '$visitDate',
+              timezone: '+09:00',
+            },
+          },
+          popup: {
+            id: '$popup._id',
+            name: '$popup.name',
+          },
+          elements: 1,
+          isPublic: 1,
+        },
+      },
+    ]);
+
+    if (cardReview.length === 0) {
+      throw new NotFoundException('Review not found');
+    }
+
+    cardReview[0].cardImage = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      cardReview[0].cardImage,
+    );
+
+    return cardReview[0];
   }
 
   async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {

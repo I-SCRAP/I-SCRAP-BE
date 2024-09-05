@@ -7,6 +7,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { PopupsModule } from './popups/popups.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { SearchModule } from './search/search.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SearchModule } from './search/search.module';
     PopupsModule,
     BookmarksModule,
     SearchModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
