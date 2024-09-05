@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ReviewsModule } from './reviews/reviews.module';
 import { PopupsModule } from './popups/popups.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
     ReviewsModule,
     PopupsModule,
     BookmarksModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
