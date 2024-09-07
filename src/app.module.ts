@@ -8,9 +8,15 @@ import { PopupsModule } from './popups/popups.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: process.env.JWT_KEY, // JWT 시크릿 키
+      signOptions: { expiresIn: '1d' }, // JWT 토큰 유효 기간 1일
+    }),
     ConfigModule.forRoot({
       envFilePath: [`.env`],
     }),
@@ -24,6 +30,6 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtAuthGuard],
 })
 export class AppModule {}
