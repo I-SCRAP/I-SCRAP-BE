@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { SearchModule } from './search/search.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     BookmarksModule,
     AuthModule,
     UsersModule,
+    SearchModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService, JwtAuthGuard],
