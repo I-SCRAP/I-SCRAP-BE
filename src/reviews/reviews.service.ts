@@ -6,10 +6,14 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 import { DeleteReviewsDto } from './dto/delete-reviews.dto';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly reviewsRepository: ReviewsRepository) {}
+  constructor(
+    private readonly reviewsRepository: ReviewsRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
   async getAllReviews(userId: string, page: string) {
     const pageNumber = parseInt(page, 10);
@@ -17,11 +21,36 @@ export class ReviewsService {
       userId,
       pageNumber,
     );
+
+    allReviews.forEach(async (review) => {
+      review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardFront,
+      );
+      review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+        process.env.S3_USER_BUCKET,
+        userId,
+        review.cardBack,
+      );
+    });
     return allReviews;
   }
 
   async getReviewById(userId: string, reviewId: string) {
     const review = await this.reviewsRepository.getReviewById(userId, reviewId);
+    review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review.cardFront,
+    );
+
+    review[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      review.cardBack,
+    );
+
     return review;
   }
 
@@ -54,6 +83,28 @@ export class ReviewsService {
       userId,
       reviewId,
     );
+
+    textReview.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview.cardFront,
+    );
+
+    textReview.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      textReview.cardBack,
+    );
+
+    textReview.photos = await Promise.all(
+      textReview.photos.map((photo) =>
+        this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          photo,
+        ),
+      ),
+    );
     return textReview;
   }
 
@@ -62,6 +113,13 @@ export class ReviewsService {
       userId,
       reviewId,
     );
+
+    cardReview.cardImage = await this.s3Service.generatePresignedDownloadUrl(
+      process.env.S3_USER_BUCKET,
+      userId,
+      cardReview.cardImage,
+    );
+
     return cardReview;
   }
 
@@ -95,5 +153,22 @@ export class ReviewsService {
       reviewId,
     );
     return comments;
+  }
+
+  async getRecentReviews(userId: string) {
+    let recentReviews = await this.reviewsRepository.getRecentReviews(userId);
+
+    recentReviews = await Promise.all(
+      recentReviews.map(async (review) => {
+        review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          review.cardFront,
+        );
+        return review;
+      }),
+    );
+
+    return recentReviews;
   }
 }
