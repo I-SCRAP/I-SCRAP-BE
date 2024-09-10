@@ -17,23 +17,26 @@ export class ReviewsService {
 
   async getAllReviews(userId: string, page: string) {
     const pageNumber = parseInt(page, 10);
-    const allReviews = await this.reviewsRepository.getAllReviews(
+    let allReviews = await this.reviewsRepository.getAllReviews(
       userId,
       pageNumber,
     );
 
-    allReviews.forEach(async (review) => {
-      review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
-        process.env.S3_USER_BUCKET,
-        userId,
-        review.cardFront,
-      );
-      review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
-        process.env.S3_USER_BUCKET,
-        userId,
-        review.cardBack,
-      );
-    });
+    allReviews = await Promise.all(
+      allReviews.map(async (review) => {
+        review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          review.cardFront,
+        );
+        review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          review.cardBack,
+        );
+        return review;
+      }),
+    );
     return allReviews;
   }
 
