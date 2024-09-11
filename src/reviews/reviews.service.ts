@@ -5,13 +5,18 @@ import { ReviewsRepository } from './reviews.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
+import { DeleteReviewsDto } from './dto/delete-reviews.dto';
 
 @Injectable()
 export class ReviewsService {
   constructor(private readonly reviewsRepository: ReviewsRepository) {}
 
-  async getAllReviews(userId: string, page: number) {
-    const allReviews = await this.reviewsRepository.getAllReviews(userId, page);
+  async getAllReviews(userId: string, page: string) {
+    const pageNumber = parseInt(page, 10);
+    const allReviews = await this.reviewsRepository.getAllReviews(
+      userId,
+      pageNumber,
+    );
     return allReviews;
   }
 
@@ -22,6 +27,10 @@ export class ReviewsService {
 
   async deleteReview(userId: string, reviewId: string) {
     await this.reviewsRepository.deleteReview(userId, reviewId);
+  }
+
+  async deleteReviews(userId: string, deleteReviewsDto: DeleteReviewsDto) {
+    await this.reviewsRepository.deleteReviews(userId, deleteReviewsDto);
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
@@ -46,6 +55,14 @@ export class ReviewsService {
       reviewId,
     );
     return textReview;
+  }
+
+  async getCardReview(userId: string, reviewId: string) {
+    const cardReview = await this.reviewsRepository.getCardReview(
+      userId,
+      reviewId,
+    );
+    return cardReview;
   }
 
   async likeReview(userId: string, createReviewLikeDto: CreateReviewLikeDto) {
