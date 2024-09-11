@@ -205,6 +205,7 @@ export class PopupsRepository {
       {
         $project: {
           _id: 0,
+          id: '$_id',
           // name: 1,
           poster: 1,
           dateRange: 1,
