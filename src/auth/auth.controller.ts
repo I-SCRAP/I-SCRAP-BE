@@ -61,6 +61,13 @@ export class AuthController {
 
     const { email, name, picture } = userInfo.data;
 
+    // 사용자 정보로 회원가입 또는 로그인 처리
+    const jwtTokens = await this.authService.googleLogin({
+      email,
+      name,
+      picture,
+    });
+
     // ID Token을 쿠키에 저장
     res.cookie('id_token', id_token, {
       httpOnly: true,

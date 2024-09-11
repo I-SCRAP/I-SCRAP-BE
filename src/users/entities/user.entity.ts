@@ -10,9 +10,6 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Review' })
-  reviewIds: Types.ObjectId[];
-
   @Prop({ required: true })
   platform: string;
 
