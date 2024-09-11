@@ -48,7 +48,7 @@ export class AuthController {
       }).toString(),
     });
 
-    const { id_token, access_token, refresh_token } = data;
+    const { access_token, id_token, refresh_token } = data;
 
     // Access Token을 사용해 구글에서 사용자 정보 가져오기
     const userInfo = await axios({
@@ -61,21 +61,14 @@ export class AuthController {
 
     const { email, name, picture } = userInfo.data;
 
-    // 사용자 정보로 회원가입 또는 로그인 처리
-    const jwtTokens = await this.authService.googleLogin({
-      email,
-      name,
-      picture,
-    });
-
-    // ID Token을 HTTP-Only 쿠키에 저장
-    res.cookie('id_token', jwtTokens.accessToken, {
-      httpOnly: true, // JavaScript에서 접근 불가
+    // ID Token을 쿠키에 저장
+    res.cookie('id_token', id_token, {
+      httpOnly: true,
       secure: false, // 로컬 환경에서는 false, 배포 환경에서는 true로 설정
       maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
     });
 
-    // Refresh Token을 쿠키에 저장
+    // 구글에서 받은 Refresh Token을 쿠키에 저장
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: false,
