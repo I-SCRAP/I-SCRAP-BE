@@ -172,4 +172,49 @@ export class PopupsRepository {
 
     return popups;
   }
+
+  async getMonthlyPopups(): Promise<Popup[]> {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // JavaScript에서 0이 1월이므로 +1을 해줍니다.
+
+    // 이번 달의 첫날 (UTC 기준으로 9월 1일 00:00:00.000)
+    const startOfMonth = new Date(
+      Date.UTC(currentYear, currentMonth - 1, 1, 0, 0, 0, 0),
+    );
+
+    // 이번 달의 마지막 날 (UTC 기준으로 9월 30일 23:59:59.999)
+    const endOfMonth = new Date(
+      Date.UTC(currentYear, currentMonth, 0, 23, 59, 59, 999),
+    );
+
+    console.log('Start of Month:', startOfMonth);
+    console.log('End of Month:', endOfMonth);
+
+    const popups = await this.popupModel.aggregate([
+      {
+        $match: {
+          // 팝업이 이번 달에 진행 중이어야 함
+          'dateRange.start': { $lte: endOfMonth }, // 시작 날짜가 이번 달 마지막 날 이전이어야 함
+          'dateRange.end': { $gte: startOfMonth }, // 종료 날짜가 이번 달 첫날 이후여야 함
+        },
+      },
+      {
+        $sort: { 'dateRange.start': 1 }, // 팝업 시작 날짜를 기준으로 오름차순 정렬
+      },
+      {
+        $project: {
+          _id: 0,
+          // name: 1,
+          poster: 1,
+          dateRange: 1,
+          // operatingHours: 1,
+          // category: 1,
+          // bookmarkCount: 1, // 필요한 필드만 포함
+        },
+      },
+    ]);
+
+    return popups;
+  }
 }

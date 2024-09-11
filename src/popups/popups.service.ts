@@ -17,4 +17,8 @@ export class PopupsService {
   async getPersonalizedPopups() {
     return this.popupsRepository.getPersonalizedPopups();
   }
+
+  async getMonthlyPopups() {
+    return this.popupsRepository.getMonthlyPopups();
+  }
 }

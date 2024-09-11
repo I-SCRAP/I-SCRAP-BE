@@ -21,4 +21,9 @@ export class PopupsController {
   getPersonalizedPopups() {
     return this.popupsService.getPersonalizedPopups();
   }
+
+  @Get('monthly')
+  getMonthlyPopups() {
+    return this.popupsService.getMonthlyPopups();
+  }
 }
