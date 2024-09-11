@@ -165,6 +165,9 @@ export class PopupsRepository {
           },
         },
       },
+      {
+        $limit: 9, // 최대 9개의 팝업만 반환
+      },
     ]);
 
     return popups;

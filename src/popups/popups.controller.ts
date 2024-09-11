@@ -17,7 +17,7 @@ export class PopupsController {
     return this.popupsService.getPopupsSortedByBookmarks();
   }
 
-  @Get('personalized-popups')
+  @Get('home/personalized-popups')
   getPersonalizedPopups() {
     return this.popupsService.getPersonalizedPopups();
   }
