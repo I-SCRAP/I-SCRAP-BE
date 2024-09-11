@@ -9,4 +9,12 @@ export class PopupsService {
     const popupDetail = await this.popupsRepository.getPopupDetail(popupId);
     return popupDetail;
   }
+
+  async getPopupsSortedByBookmarks() {
+    return this.popupsRepository.getPopupsSortedByBookmarks();
+  }
+
+  async getPersonalizedPopups() {
+    return this.popupsRepository.getPersonalizedPopups();
+  }
 }

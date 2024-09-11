@@ -11,4 +11,14 @@ export class PopupsController {
     validateRequiredField('id', id);
     return this.popupsService.getPopupDetail(id);
   }
+
+  @Get('sorted-by-bookmarks')
+  getPopupsSortedByBookmarks() {
+    return this.popupsService.getPopupsSortedByBookmarks();
+  }
+
+  @Get('personalized-popups')
+  getPersonalizedPopups() {
+    return this.popupsService.getPersonalizedPopups();
+  }
 }

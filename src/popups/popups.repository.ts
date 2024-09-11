@@ -69,4 +69,110 @@ export class PopupsRepository {
     const objectIds = popupIds.map((id) => new ObjectId(id));
     return this.popupModel.find({ _id: { $in: objectIds } }).exec();
   }
+
+  async getPopupsSortedByBookmarks(): Promise<Popup[]> {
+    const today = new Date();
+
+    const popups = await this.popupModel.aggregate([
+      {
+        $match: {
+          'dateRange.end': { $gte: today }, // 지나간 팝업 제외 (종료 날짜가 오늘 이후인 팝업만 포함)
+        },
+      },
+      {
+        $lookup: {
+          from: 'bookmarks', // bookmarks 컬렉션과 조인
+          localField: '_id', // popups의 _id와 연결
+          foreignField: 'popupId', // bookmarks에서 popupId와 연결
+          as: 'bookmarks',
+        },
+      },
+      {
+        $addFields: {
+          bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
+        },
+      },
+      {
+        $sort: { bookmarkCount: -1 }, // 북마크 수에 따라 내림차순 정렬
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          name: 1,
+          poster: 1,
+          detailImages: 1,
+          fee: 1,
+          operatingHours: 1,
+          sizeInfo: 1,
+          description: 1,
+          dateRange: 1,
+          location: {
+            address: '$location.address',
+            latitude: '$location.latitude',
+            longitude: '$location.longitude',
+          },
+          category: 1,
+          websiteURL: 1,
+          createdDate: 1,
+          bookmarkCount: 1, // 북마크 수를 결과에 포함
+        },
+      },
+    ]);
+
+    return popups;
+  }
+
+  async getPersonalizedPopups(): Promise<Popup[]> {
+    const today = new Date();
+
+    const popups = await this.popupModel.aggregate([
+      {
+        $match: {
+          'dateRange.end': { $gte: today }, // 지나간 팝업 제외 (종료 날짜가 오늘 이후인 팝업만 포함)
+        },
+      },
+      {
+        $lookup: {
+          from: 'bookmarks', // bookmarks 컬렉션과 조인
+          localField: '_id', // popups의 _id와 연결
+          foreignField: 'popupId', // bookmarks에서 popupId와 연결
+          as: 'bookmarks',
+        },
+      },
+      {
+        $addFields: {
+          bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
+        },
+      },
+      {
+        $sort: { bookmarkCount: -1 }, // 북마크 수에 따라 내림차순 정렬
+      },
+      {
+        $project: {
+          _id: 0,
+          id: '$_id',
+          name: 1,
+          poster: 1,
+          detailImages: 1,
+          fee: 1,
+          operatingHours: 1,
+          sizeInfo: 1,
+          description: 1,
+          dateRange: 1,
+          location: {
+            address: '$location.address',
+            latitude: '$location.latitude',
+            longitude: '$location.longitude',
+          },
+          category: 1,
+          websiteURL: 1,
+          createdDate: 1,
+          bookmarkCount: 1, // 북마크 수를 결과에 포함
+        },
+      },
+    ]);
+
+    return popups;
+  }
 }

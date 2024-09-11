@@ -32,7 +32,7 @@ jobs:
           echo "JWT_EXPIRES=${{ secrets.JWT_EXPIRES }}" >> .env
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
-          echo "PROD_FRONTEND_URL=${{ secrets.PROD_FRONTEND_URL }}" >> .env 234b4c9ac36862734ff840f61cd96c914ec58987
+          echo "PROD_FRONTEND_URL=${{ secrets.PROD_FRONTEND_URL }}" >> .env
       - name: serverless deploy
         uses: serverless/github-action@v3.2
         with:
