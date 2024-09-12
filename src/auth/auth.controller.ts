@@ -88,7 +88,9 @@ export class AuthController {
         ? process.env.PROD_FRONTEND_URL
         : process.env.FRONTEND_URL;
 
-    return res.redirect(`${frontendUrl}/dashboard`);
+    return res.redirect(
+      `https://mbnbcpl609.execute-api.ap-northeast-2.amazonaws.com/dev/dashboard`,
+    );
   }
 
   // Refresh Token을 사용해 새로운 Access Token과 새로운 ID Token 발급
