@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PopupsService } from './popups.service';
 import { validateRequiredField } from 'src/utils/validation-utils';
 
@@ -6,15 +6,10 @@ import { validateRequiredField } from 'src/utils/validation-utils';
 export class PopupsController {
   constructor(private readonly popupsService: PopupsService) {}
 
-  @Get('detail')
-  getPopupDetail(@Query('id') id: string) {
+  @Get('detail/:id')
+  getPopupDetail(@Param('id') id: string) {
     validateRequiredField('id', id);
     return this.popupsService.getPopupDetail(id);
-  }
-
-  @Get('sorted-by-bookmarks')
-  getPopupsSortedByBookmarks() {
-    return this.popupsService.getPopupsSortedByBookmarks();
   }
 
   @Get('home/personalized-popups')

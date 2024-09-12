@@ -10,10 +10,6 @@ export class PopupsService {
     return popupDetail;
   }
 
-  async getPopupsSortedByBookmarks() {
-    return this.popupsRepository.getPopupsSortedByBookmarks();
-  }
-
   async getPersonalizedPopups() {
     return this.popupsRepository.getPersonalizedPopups();
   }

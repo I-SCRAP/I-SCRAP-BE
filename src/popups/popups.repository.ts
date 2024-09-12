@@ -26,6 +26,41 @@ export class PopupsRepository {
         },
       },
       {
+        $lookup: {
+          from: 'reviewLikes', // 리뷰 좋아요 테이블과 조인
+          localField: 'reviews._id', // 리뷰의 _id 필드
+          foreignField: 'reviewId', // reviewLikes에서 reviewId와 연결
+          as: 'likes', // 결과에 포함될 좋아요 필드 이름
+        },
+      },
+      {
+        $lookup: {
+          from: 'comments', // 댓글 테이블과 조인
+          localField: 'reviews._id', // 리뷰의 _id 필드
+          foreignField: 'reviewId', // comments에서 reviewId와 연결
+          as: 'comments', // 결과에 포함될 댓글 필드 이름
+        },
+      },
+      {
+        $lookup: {
+          from: 'subComments', // 서브 댓글 테이블과 조인
+          localField: 'comments._id', // 댓글의 _id 필드
+          foreignField: 'commentId', // subComments에서 commentId와 연결
+          as: 'subComments', // 결과에 포함될 서브 댓글 필드 이름
+        },
+      },
+      {
+        $addFields: {
+          reviewLikesCount: { $size: '$likes' }, // 각 리뷰에 대한 좋아요 개수 계산
+          commentsCount: {
+            $add: [
+              { $size: '$comments' }, // 댓글 수
+              { $size: '$subComments' }, // 서브 댓글 수 합산
+            ],
+          },
+        },
+      },
+      {
         $project: {
           _id: 0,
           id: '$_id',
@@ -36,7 +71,15 @@ export class PopupsRepository {
           operatingHours: 1,
           sizeInfo: 1,
           description: 1,
-          dateRange: 1,
+          dateRange: {
+            $concat: [
+              {
+                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.start' },
+              },
+              ' - ',
+              { $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' } },
+            ],
+          },
           location: {
             address: '$location.address',
             latitude: '$location.latitude',
@@ -46,81 +89,94 @@ export class PopupsRepository {
           websiteURL: 1,
           createdDate: 1,
           reviews: {
-            _id: 1,
-            userId: 1,
-            visitDate: 1,
-            rating: 1,
-            title: 1,
-            shortComment: 1,
-            detailedReview: 1,
-            photos: 1,
-            status: 1,
-            createdDate: 1,
+            $map: {
+              input: '$reviews',
+              as: 'review',
+              in: {
+                id: '$$review._id', // 리뷰의 id
+                cardFront: '$$review.cardFront', // cardFront 이미지
+                rating: '$$review.rating', // 평점
+                shortComment: '$$review.shortComment', // 짧은 코멘트
+                reviewLikes: '$reviewLikesCount', // 좋아요 수
+                comments: '$commentsCount', // 모든 코멘트(댓글 + 서브 댓글) 합산
+              },
+            },
           },
         },
       },
     ]);
 
-    return popupDetail.length > 0 ? popupDetail[0] : null;
+    if (popupDetail.length === 0) {
+      return null;
+    }
+
+    const popup = popupDetail[0];
+
+    // operatingHours의 정확한 타입 지정
+    const operatingHours = popup.operatingHours as Record<
+      string,
+      { open?: string; close?: string; closed?: boolean }
+    >;
+
+    // 영어 요일을 한글 요일로 변환하는 맵
+    const dayMap: Record<string, string> = {
+      Monday: '월',
+      Tuesday: '화',
+      Wednesday: '수',
+      Thursday: '목',
+      Friday: '금',
+      Saturday: '토',
+      Sunday: '일',
+    };
+
+    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const weekdayHours = operatingHours[weekdays[0]];
+
+    const allWeekdaysSame = weekdays.every(
+      (day) =>
+        operatingHours[day]?.open === weekdayHours?.open &&
+        operatingHours[day]?.close === weekdayHours?.close,
+    );
+
+    if (
+      (allWeekdaysSame &&
+        !(
+          operatingHours.Saturday?.open === weekdayHours.open &&
+          operatingHours.Saturday?.close === weekdayHours.close
+        )) ||
+      operatingHours.Sunday?.closed
+    ) {
+      // 요일별로 운영 시간을 개별적으로 표시
+      const days = Object.entries(operatingHours)
+        .map(([day, hours]) => {
+          const koreanDay = dayMap[day]; // 영어 요일을 한글로 변환
+          if (hours?.closed) {
+            return `${koreanDay} 휴무`; // 휴무일 표시
+          }
+          return `${koreanDay} ${hours?.open}-${hours?.close}`; // 요일별 시간 표시
+        })
+        .join('\n');
+
+      popup.operatingHours = days;
+    } else {
+      // 모든 요일이 동일하면 "매일"로 표시
+      popup.operatingHours = `매일 ${weekdayHours.open}-${weekdayHours.close}`;
+    }
+
+    // fee 값 처리
+    if (popup.fee === 0) {
+      popup.fee = '무료';
+    } else {
+      popup.fee = `${popup.fee}원`;
+    }
+
+    return popup;
   }
 
   // 특정 popupId 목록에 대한 팝업 상세 정보 조회
   async findPopupsByIds(popupIds: string[]): Promise<Popup[]> {
     const objectIds = popupIds.map((id) => new ObjectId(id));
     return this.popupModel.find({ _id: { $in: objectIds } }).exec();
-  }
-
-  async getPopupsSortedByBookmarks(): Promise<Popup[]> {
-    const today = new Date();
-
-    const popups = await this.popupModel.aggregate([
-      {
-        $match: {
-          'dateRange.end': { $gte: today }, // 지나간 팝업 제외 (종료 날짜가 오늘 이후인 팝업만 포함)
-        },
-      },
-      {
-        $lookup: {
-          from: 'bookmarks', // bookmarks 컬렉션과 조인
-          localField: '_id', // popups의 _id와 연결
-          foreignField: 'popupId', // bookmarks에서 popupId와 연결
-          as: 'bookmarks',
-        },
-      },
-      {
-        $addFields: {
-          bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
-        },
-      },
-      {
-        $sort: { bookmarkCount: -1 }, // 북마크 수에 따라 내림차순 정렬
-      },
-      {
-        $project: {
-          _id: 0,
-          id: '$_id',
-          name: 1,
-          poster: 1,
-          detailImages: 1,
-          fee: 1,
-          operatingHours: 1,
-          sizeInfo: 1,
-          description: 1,
-          dateRange: 1,
-          location: {
-            address: '$location.address',
-            latitude: '$location.latitude',
-            longitude: '$location.longitude',
-          },
-          category: 1,
-          websiteURL: 1,
-          createdDate: 1,
-          bookmarkCount: 1, // 북마크 수를 결과에 포함
-        },
-      },
-    ]);
-
-    return popups;
   }
 
   async getPersonalizedPopups(): Promise<Popup[]> {
@@ -146,27 +202,28 @@ export class PopupsRepository {
         },
       },
       {
-        $sort: { bookmarkCount: -1 }, // 북마크 수에 따라 내림차순 정렬
-      },
-      {
         $project: {
           _id: 0,
           id: '$_id',
           name: 1,
           poster: 1,
-          dateRange: 1,
-          operatingHours: 1,
+          dateRange: {
+            $concat: [
+              {
+                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.start' },
+              },
+              ' - ',
+              { $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' } },
+            ],
+          },
+          fee: 1,
           category: 1,
           bookmarkCount: 1,
-          location: {
-            address: '$location.address',
-            latitude: '$location.latitude',
-            longitude: '$location.longitude',
-          },
+          location: '$location.address', // location의 address 필드만 선택
         },
       },
       {
-        $limit: 9, // 최대 9개의 팝업만 반환
+        $sample: { size: 9 }, // 랜덤으로 9개의 팝업 선택
       },
     ]);
 
@@ -206,12 +263,16 @@ export class PopupsRepository {
         $project: {
           _id: 0,
           id: '$_id',
-          // name: 1,
           poster: 1,
-          dateRange: 1,
-          // operatingHours: 1,
-          // category: 1,
-          // bookmarkCount: 1, // 필요한 필드만 포함
+          dateRange: {
+            $concat: [
+              {
+                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.start' },
+              },
+              ' - ',
+              { $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' } },
+            ],
+          },
         },
       },
     ]);
