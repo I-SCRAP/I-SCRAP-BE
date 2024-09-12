@@ -4,13 +4,15 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import axios from 'axios';
+import { UsersRepository } from 'src/users/users.repository'; // UsersRepository 추가
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly usersRepository: UsersRepository, // UsersRepository 주입
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -28,11 +30,30 @@ export class JwtAuthGuard implements CanActivate {
       );
       const { email, sub } = response.data;
 
+      // MongoDB에서 사용자 정보 조회 (이메일로 조회)
+      const user = await this.usersRepository.findOneGetByEmail(email);
+
+      if (!user) {
+        throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
+      }
+
       // 인증된 사용자 정보를 요청에 추가
-      request.user = { email, sub };
+      request.user = {
+        email: user.email, // 이메일
+        id: user._id, // MongoDB에서 가져온 사용자 ID
+        name: user.name, // 사용자 이름
+        profileImage: user.profileImage, // 프로필 이미지
+        platform: user.platform,
+        notification: user.notification,
+        createdDate: user.createdDate,
+      };
+
       return true;
     } catch (error) {
-      throw new UnauthorizedException('유효하지 않은 ID Token입니다.');
+      console.error('ID Token 검증 실패 또는 사용자 조회 실패:', error.message);
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
     }
   }
 }
