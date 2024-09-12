@@ -71,14 +71,14 @@ export class AuthController {
     // ID Token을 쿠키에 저장
     res.cookie('id_token', id_token, {
       httpOnly: true,
-      secure: false, // 로컬 환경에서는 false, 배포 환경에서는 true로 설정
+      secure: true, // 로컬 환경에서는 false, 배포 환경에서는 true로 설정
       maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
     });
 
     // 구글에서 받은 Refresh Token을 쿠키에 저장
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 (7일간 유효)
     });
 
@@ -123,14 +123,14 @@ export class AuthController {
       // 새로운 Access Token을 쿠키에 저장
       res.cookie('access_token', access_token, {
         httpOnly: true,
-        secure: false, // 로컬 환경에서는 false, 배포 환경에서는 true
+        secure: true, // 로컬 환경에서는 false, 배포 환경에서는 true
         maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
       });
 
       // 새로운 ID Token을 쿠키에 저장 (JWT 인증에 사용)
       res.cookie('id_token', id_token, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
       });
 
