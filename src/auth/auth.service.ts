@@ -29,8 +29,15 @@ export class AuthService {
       });
     }
 
-    // JWT Access Token 발급 (1일 동안 유효)
-    const payload = { email: findUser.email, sub: findUser.id };
+    // JWT Access Token 발급 (MongoDB _id 포함)
+    const payload = {
+      email: findUser.email,
+      id: findUser.id,
+      name: findUser.name,
+      picture: findUser.profileImage,
+      _id: findUser._id, // MongoDB ObjectId를 페이로드에 추가
+    };
+
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_KEY,
       expiresIn: '1d', // 1일 동안 유효
