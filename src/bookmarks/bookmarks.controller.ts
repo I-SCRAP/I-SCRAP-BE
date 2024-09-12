@@ -39,9 +39,9 @@ export class BookmarksController {
     );
   }
 
-  @Post('unbookmark')
+  @Post('unbookmark/:userId')
   async unbookmarkPopups(
-    @Query('userId') userId: string,
+    @Param('userId') userId: string,
     @Body('popupIds') popupIds: string[],
   ): Promise<{ message: string }> {
     if (!popupIds || popupIds.length === 0) {
