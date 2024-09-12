@@ -179,6 +179,51 @@ export class PopupsRepository {
     return this.popupModel.find({ _id: { $in: objectIds } }).exec();
   }
 
+  // 특정 popupId 목록에 대한 팝업 상세 정보 조회 + 페이지네이션 추가 -> 북마크한 팝업 모두 불러오기 기능
+  async findAllPopupsByIds(
+    popupIds: string[],
+    page: number,
+    limit: number = 12,
+  ): Promise<Popup[]> {
+    const objectIds = popupIds.map((id) => new ObjectId(id));
+
+    // 페이지네이션을 위한 skip과 limit 계산
+    const skip = (page - 1) * limit;
+
+    // 필요한 필드만 선택하고, 날짜 형식 변환 + 페이지네이션 적용
+    return this.popupModel
+      .aggregate([
+        {
+          $match: {
+            _id: { $in: objectIds },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            name: 1,
+            poster: 1,
+            dateRange: {
+              start: {
+                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.start' },
+              },
+              end: {
+                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' },
+              },
+            },
+          },
+        },
+        {
+          $skip: skip, // 스킵할 문서 수
+        },
+        {
+          $limit: limit, // 반환할 문서 수 (페이지 당 12개)
+        },
+      ])
+      .exec();
+  }
+
   async getPersonalizedPopups(): Promise<Popup[]> {
     const today = new Date();
 

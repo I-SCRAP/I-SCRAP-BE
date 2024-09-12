@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { Popup } from 'src/popups/entities/popup.entity';
 
@@ -18,6 +18,24 @@ export class BookmarksController {
   @Get('popups')
   async getBookmarkedPopups(@Query('userId') userId: string): Promise<Popup[]> {
     return this.bookmarkService.getBookmarkedPopups(userId);
+  }
+
+  @Get('popups/:userId')
+  async getAllBookmarkedPopups(
+    @Param('userId') userId: string,
+    @Query('page') page: string = '1', // 기본값 1
+    @Query('limit') limit: string = '12', // 기본값 12
+  ): Promise<Popup[]> {
+    // page와 limit는 문자열로 들어오므로, 숫자로 변환
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    // BookmarkService에 페이지네이션 관련 값 전달
+    return this.bookmarkService.getAllBookmarkedPopups(
+      userId,
+      pageNumber,
+      limitNumber,
+    );
   }
 
   @Post('unbookmark')
