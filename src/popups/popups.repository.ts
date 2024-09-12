@@ -184,19 +184,35 @@ export class PopupsRepository {
     popupIds: string[],
     page: number,
     limit: number = 12,
+    status: string,
   ): Promise<Popup[]> {
     const objectIds = popupIds.map((id) => new ObjectId(id));
 
     // 페이지네이션을 위한 skip과 limit 계산
     const skip = (page - 1) * limit;
 
+    // 현재 날짜 가져오기
+    const currentDate = new Date();
+
+    // 진행 상태에 따른 조건 설정
+    let matchCondition: any = {
+      _id: { $in: objectIds },
+    };
+
+    if (status === 'ongoing') {
+      // 진행 중인 팝업: start <= 현재 날짜 <= end
+      matchCondition['dateRange.start'] = { $lte: currentDate };
+      matchCondition['dateRange.end'] = { $gte: currentDate };
+    } else if (status === 'upcoming') {
+      // 진행 예정인 팝업: 현재 날짜 < start
+      matchCondition['dateRange.start'] = { $gt: currentDate };
+    }
+
     // 필요한 필드만 선택하고, 날짜 형식 변환 + 페이지네이션 적용
     return this.popupModel
       .aggregate([
         {
-          $match: {
-            _id: { $in: objectIds },
-          },
+          $match: matchCondition,
         },
         {
           $project: {

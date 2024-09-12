@@ -27,19 +27,25 @@ export class BookmarksService {
     return this.popupsRepository.findPopupsByIds(popupIds);
   }
 
-  // 특정 사용자가 북마크한 모든 팝업의 상세 정보 조회
+  // 특정 사용자가 북마크한 팝업 중 페이지네이션 및 상태별 필터링
   async getAllBookmarkedPopups(
     userId: string,
     page: number,
     limit: number,
+    status: string,
   ): Promise<Popup[]> {
     // 1. 북마크된 popupId 목록 조회
     const popupIds = await this.bookmarksRepository.findBookmarkedPopups(
       userId,
     );
 
-    // 2. 해당 popupId 목록으로 팝업 상세 정보 조회 (페이지네이션 추가)
-    return this.popupsRepository.findAllPopupsByIds(popupIds, page, limit);
+    // 2. 북마크된 팝업 중 페이지네이션 + 진행 상태 필터링
+    return this.popupsRepository.findAllPopupsByIds(
+      popupIds,
+      page,
+      limit,
+      status,
+    );
   }
 
   // 여러 팝업의 북마크를 해제하는 메서드
