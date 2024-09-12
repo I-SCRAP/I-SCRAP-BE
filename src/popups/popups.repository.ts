@@ -324,4 +324,33 @@ export class PopupsRepository {
 
     return popups;
   }
+
+  // 주어진 popupId 목록 중에서 주간에 운영하는 팝업만 조회
+  async findOperatingPopupsByIdsInDateRange(
+    popupIds: string[],
+    startOfWeek: Date,
+    endOfWeek: Date,
+  ): Promise<Popup[]> {
+    const objectIds = popupIds.map((id) => new ObjectId(id));
+
+    return this.popupModel
+      .aggregate([
+        {
+          $match: {
+            _id: { $in: objectIds },
+            'dateRange.start': { $lte: endOfWeek }, // 팝업 시작일이 주간 종료일보다 이전 또는 같음
+            'dateRange.end': { $gte: startOfWeek }, // 팝업 종료일이 주간 시작일보다 이후 또는 같음
+          },
+        },
+        {
+          $project: {
+            _id: 0, // _id 필드를 제외
+            id: '$_id', // _id를 id로 변환하여 반환
+            name: 1,
+            dateRange: 1,
+          },
+        },
+      ])
+      .exec();
+  }
 }

@@ -50,4 +50,23 @@ export class BookmarksService {
 
     await this.bookmarksRepository.unbookmarkPopups(userId, popupIds);
   }
+
+  // 특정 사용자가 북마크한 팝업 중 특정 날짜 범위에 운영하는 팝업 조회
+  async getPopupsInDateRange(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Popup[]> {
+    // 1. 북마크된 popupId 목록 조회
+    const popupIds = await this.bookmarksRepository.findBookmarkedPopups(
+      userId,
+    );
+
+    // 2. 해당 popupId 목록 중에서 특정 날짜 범위에 운영 중인 팝업 조회
+    return this.popupsRepository.findOperatingPopupsByIdsInDateRange(
+      popupIds,
+      startDate,
+      endDate,
+    );
+  }
 }
