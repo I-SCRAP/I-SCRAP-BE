@@ -12,20 +12,18 @@ import { BookmarksService } from './bookmarks.service';
 import { Popup } from 'src/popups/entities/popup.entity';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
 @Controller('bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarkService: BookmarksService) {}
 
   @Get('popups')
-  async getBookmarkedPopups(@Req() req): Promise<Popup[]> {
+  async getBookmarkedPopups(): Promise<Popup[]> {
     const userId = '64dcc0e7f001b623d8a71ba2';
     return this.bookmarkService.getBookmarkedPopups(userId);
   }
 
   @Get('bookmarked-popups')
   async getAllBookmarkedPopups(
-    @Req() req,
     @Query('page') page: string = '1', // 기본값 1
     @Query('limit') limit: string = '12', // 기본값 12
     @Query('status') status: string = 'all', // 기본값 'all'
@@ -45,7 +43,6 @@ export class BookmarksController {
 
   @Get('date-range')
   async getPopupsInDateRange(
-    @Req() req,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ): Promise<Popup[]> {
@@ -58,7 +55,6 @@ export class BookmarksController {
 
   @Get('monthly')
   async getPopupsInMonth(
-    @Req() req,
     @Query('year') year: string,
     @Query('month') month: string,
   ): Promise<Popup[]> {
@@ -83,7 +79,6 @@ export class BookmarksController {
 
   @Post('unbookmark')
   async unbookmarkPopups(
-    @Req() req,
     @Body('popupIds') popupIds: string[],
   ): Promise<{ message: string }> {
     const userId = '64dcc0e7f001b623d8a71ba2';
@@ -96,7 +91,7 @@ export class BookmarksController {
   }
 
   @Post('/:popupId')
-  async toggleBookmark(@Req() req, @Param('popupId') popupId: string) {
+  async toggleBookmark(@Param('popupId') popupId: string) {
     const userId = '64dcc0e7f001b623d8a71ba2';
     const message = await this.bookmarkService.toggleBookmark(userId, popupId);
     return { message };
