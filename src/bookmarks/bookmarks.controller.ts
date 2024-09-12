@@ -1,32 +1,36 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { Popup } from 'src/popups/entities/popup.entity';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarkService: BookmarksService) {}
 
-  @Post()
-  async toggleBookmark(
-    @Query('userId') userId: string,
-    @Query('popupId') popupId: string,
-  ) {
-    const message = await this.bookmarkService.toggleBookmark(userId, popupId);
-    return { message };
-  }
-
   @Get('popups')
-  async getBookmarkedPopups(@Query('userId') userId: string): Promise<Popup[]> {
+  async getBookmarkedPopups(@Req() req): Promise<Popup[]> {
+    const userId = '64dcc0e7f001b623d8a71ba2';
     return this.bookmarkService.getBookmarkedPopups(userId);
   }
 
-  @Get('popups/:userId')
+  @Get('bookmarked-popups')
   async getAllBookmarkedPopups(
-    @Param('userId') userId: string,
+    @Req() req,
     @Query('page') page: string = '1', // 기본값 1
     @Query('limit') limit: string = '12', // 기본값 12
     @Query('status') status: string = 'all', // 기본값 'all'
   ): Promise<Popup[]> {
+    const userId = '64dcc0e7f001b623d8a71ba2';
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
@@ -39,37 +43,26 @@ export class BookmarksController {
     );
   }
 
-  @Post('unbookmark/:userId')
-  async unbookmarkPopups(
-    @Param('userId') userId: string,
-    @Body('popupIds') popupIds: string[],
-  ): Promise<{ message: string }> {
-    if (!popupIds || popupIds.length === 0) {
-      return { message: 'No popup IDs provided' };
-    }
-
-    await this.bookmarkService.unbookmarkPopups(userId, popupIds);
-    return { message: 'Bookmarks removed successfully' };
-  }
-
-  @Get('date-range/:userId')
+  @Get('date-range')
   async getPopupsInDateRange(
-    @Param('userId') userId: string,
+    @Req() req,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ): Promise<Popup[]> {
+    const userId = '64dcc0e7f001b623d8a71ba2';
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     return this.bookmarkService.getPopupsInDateRange(userId, start, end);
   }
 
-  @Get('monthly/:userId')
+  @Get('monthly')
   async getPopupsInMonth(
-    @Param('userId') userId: string,
+    @Req() req,
     @Query('year') year: string,
     @Query('month') month: string,
   ): Promise<Popup[]> {
+    const userId = '64dcc0e7f001b623d8a71ba2';
     const yearNumber = parseInt(year, 10);
     const monthNumber = parseInt(month, 10);
 
@@ -86,5 +79,26 @@ export class BookmarksController {
       startOfMonth,
       endOfMonth,
     );
+  }
+
+  @Post('unbookmark')
+  async unbookmarkPopups(
+    @Req() req,
+    @Body('popupIds') popupIds: string[],
+  ): Promise<{ message: string }> {
+    const userId = '64dcc0e7f001b623d8a71ba2';
+    if (!popupIds || popupIds.length === 0) {
+      return { message: 'No popup IDs provided' };
+    }
+
+    await this.bookmarkService.unbookmarkPopups(userId, popupIds);
+    return { message: 'Bookmarks removed successfully' };
+  }
+
+  @Post('/:popupId')
+  async toggleBookmark(@Req() req, @Param('popupId') popupId: string) {
+    const userId = '64dcc0e7f001b623d8a71ba2';
+    const message = await this.bookmarkService.toggleBookmark(userId, popupId);
+    return { message };
   }
 }

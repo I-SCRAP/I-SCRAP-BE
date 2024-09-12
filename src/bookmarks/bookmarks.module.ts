@@ -5,6 +5,7 @@ import { BookmarksService } from './bookmarks.service';
 import { BookmarksController } from './bookmarks.controller';
 import { BookmarksRepository } from './bookmarks.repository';
 import { PopupsModule } from 'src/popups/popups.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PopupsModule } from 'src/popups/popups.module';
       { name: Bookmark.name, schema: BookmarkSchema },
     ]),
     forwardRef(() => PopupsModule),
+    UsersModule,
   ],
   controllers: [BookmarksController],
   providers: [BookmarksService, BookmarksRepository],
