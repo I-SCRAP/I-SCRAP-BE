@@ -79,6 +79,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
       maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
+      sameSite: 'None', // 크로스사이트에서 쿠키 전송을 허용
     });
 
     // 구글에서 받은 Refresh Token을 쿠키에 저장
@@ -86,6 +87,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 (7일간 유효)
+      sameSite: 'None', // 크로스사이트에서 쿠키 전송을 허용
     });
 
     // 리다이렉트
