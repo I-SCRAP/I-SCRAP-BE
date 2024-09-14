@@ -28,6 +28,7 @@ jobs:
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
           echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> .env
+          echo "GOOGLE_REDIRECT_URI_DEV=${{ secrets.GOOGLE_REDIRECT_URI_DEV }}" >> .env
           echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
           echo "JWT_EXPIRES=${{ secrets.JWT_EXPIRES }}" >> .env
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
