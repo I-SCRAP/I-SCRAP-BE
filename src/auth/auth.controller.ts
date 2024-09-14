@@ -23,7 +23,13 @@ export class AuthController {
   // 구글 로그인 URL로 리다이렉트
   @Get('google/login')
   async googleLogin(@Res() res) {
-    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_REDIRECT_URI}&response_type=code&scope=email%20profile&access_type=offline&prompt=consent`;
+    const redirectUri =
+      process.env.NODE_ENV === 'production'
+        ? process.env.GOOGLE_REDIRECT_URI
+        : process.env.GOOGLE_REDIRECT_URI_DEV;
+
+    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&access_type=offline&prompt=consent`;
+
     return res.redirect(googleAuthURL);
   }
 
@@ -71,17 +77,15 @@ export class AuthController {
     // ID Token을 쿠키에 저장
     res.cookie('id_token', id_token, {
       httpOnly: true,
-      secure: true, // 로컬 환경에서는 false, 배포 환경에서는 true로 설정
+      secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
       maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
-      sameSite: 'None', // 크로스사이트에서 쿠키 전송을 허용
     });
 
     // 구글에서 받은 Refresh Token을 쿠키에 저장
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 (7일간 유효)
-      sameSite: 'None', // 크로스사이트에서 쿠키 전송을 허용
     });
 
     // 리다이렉트
@@ -90,7 +94,7 @@ export class AuthController {
         ? process.env.PROD_FRONTEND_URL
         : process.env.FRONTEND_URL;
 
-    return res.redirect(`https://www.naver.com/`);
+    return res.redirect(`${frontendUrl}/dashboard`);
   }
 
   // Refresh Token을 사용해 새로운 Access Token과 새로운 ID Token 발급
