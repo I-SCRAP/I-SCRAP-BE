@@ -617,6 +617,7 @@ export class ReviewsRepository {
           _id: 0,
           id: '$_id',
           cardFront: 1,
+          cardBack: 1,
           visitDate: {
             $dateToString: {
               format: '%Y.%m.%d',
@@ -633,7 +634,7 @@ export class ReviewsRepository {
         },
       },
       {
-        $limit: 5,
+        $limit: 8,
       },
     ]);
 
