@@ -168,6 +168,13 @@ export class ReviewsService {
           userId,
           review.cardFront,
         );
+
+        review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          userId,
+          review.cardBack,
+        );
+
         return review;
       }),
     );
