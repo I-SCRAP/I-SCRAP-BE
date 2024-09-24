@@ -99,7 +99,7 @@ export class AuthController {
         ? process.env.PROD_FRONTEND_URL
         : process.env.FRONTEND_URL;
 
-    return res.redirect(`${frontendUrl}/dashboard`);
+    return res.redirect(`${frontendUrl}`);
   }
 
   // Refresh Token을 사용해 새로운 Access Token과 새로운 ID Token 발급
@@ -164,6 +164,7 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req) {
     // req.user는 JwtAuthGuard에서 인증된 사용자 정보가 추가된 객체
+    console.log(req.user);
     return req.user; // 인증된 사용자 정보를 반환
   }
 
