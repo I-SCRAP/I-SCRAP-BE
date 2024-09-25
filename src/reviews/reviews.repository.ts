@@ -186,6 +186,7 @@ export class ReviewsRepository {
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
     // [TODO] popupId가 존재하는지 확인, 존재하지 않으면 에러 발생
+    // [TODO] 이미 리뷰가 존재하는지 확인, 존재하면 에러 발생
 
     await this.reviewModel.create({
       ...createReviewDto,

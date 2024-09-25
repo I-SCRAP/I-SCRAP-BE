@@ -4,27 +4,32 @@ import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class CreateReviewDto {
+  @IsOptional()
   @IsString()
-  place: string;
+  place?: string;
 
   @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
   visitDate: Date;
 
+  @IsOptional()
   @IsNumber()
-  amount: number;
+  amount?: number;
 
+  @IsOptional()
   @IsString()
-  companions: string;
+  companions?: string;
 
+  @IsOptional()
   @IsNumber()
-  rating: number;
+  rating?: number;
 
   @Transform(({ value }) => new ObjectId(value))
   @IsNotEmpty()
@@ -37,4 +42,12 @@ export class CreateReviewDto {
   @IsString()
   @IsNotEmpty()
   cardImage: string;
+
+  @IsString()
+  @IsNotEmpty()
+  cardBack: string;
+
+  @IsOptional()
+  @IsString()
+  shortComment?: string;
 }
