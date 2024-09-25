@@ -21,7 +21,7 @@ export class CreateReviewDto {
 
   @IsOptional()
   @IsNumber()
-  amount?: number;
+  amount?: string;
 
   @IsOptional()
   @IsString()
