@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SearchRepository } from './search.repository';
-import { FilterDto, Location, SortBy } from './dto/filter.dto';
+import { Category, FilterDto, Location, SortBy } from './dto/filter.dto';
 
 @Injectable()
 export class SearchService {
@@ -18,9 +18,14 @@ export class SearchService {
       end,
       location,
       category,
+      popupName,
     } = filterDto;
 
     const query: any = {};
+
+    if (popupName) {
+      query.name = { $regex: popupName, $options: 'i' };
+    }
 
     const now = new Date();
     if (start || end) {
@@ -31,25 +36,72 @@ export class SearchService {
       if (endDate) query['dateRange.end'] = { $gte: startDate || now };
     }
 
+    const locationMappings: { [key: string]: Location } = {
+      잠실: Location.JAMSIL,
+      송파구: Location.JAMSIL,
+      성수: Location.SEONGSU,
+      성동구: Location.SEONGSU,
+      홍대: Location.HONGDAE,
+      마포구: Location.HONGDAE,
+      더현대: Location.THEHYUNDAI,
+      영등포구: Location.THEHYUNDAI,
+      용산구: Location.YONGSAN,
+      종로: Location.JONGNO,
+    };
+
+    const mappedLocationNames = Object.keys(locationMappings);
+    const mapLocation = (inputLocation: string): Location | null => {
+      for (const key in locationMappings) {
+        if (inputLocation.includes(key)) {
+          return locationMappings[key];
+        }
+      }
+      return null;
+    };
+
     if (location) {
-      if (location.includes(Location.ALL_REGIONS)) {
+      const mappedLocation = location.map(mapLocation);
+      const validLocations = mappedLocation.filter(
+        (loc) => loc !== null,
+      ) as Location[];
+
+      if (validLocations.includes(Location.ALL_REGIONS)) {
         delete query['location.address'];
-      } else if (location.includes(Location.OTHER_REGIONS)) {
+      } else if (validLocations.length === 0) {
+        console.log('validLocations.length === 0');
         query['location.address'] = {
           $not: {
-            $regex: `^(${Location.JAMSIL}|${Location.SEONGSU}|${Location.HONGDAE}|${Location.JONGNO}|${Location.YONGSAN}|${Location.THEHYUNDAI}|${Location.GYEONGGI_REGION})`,
+            $regex: `(${mappedLocationNames.join('|')})`,
             $options: 'i',
           },
         };
       } else {
         query['location.address'] = {
-          $in: location.map((loc) => new RegExp(loc, 'i')),
+          $in: validLocations.map((loc) => new RegExp(loc, 'i')),
         };
       }
     }
 
     if (category) {
-      query.category = { $in: category };
+      if (category.includes(Category.ALL_CATEGORIES)) {
+        delete query.category;
+      } else if (category.includes(Category.OTHERS)) {
+        query.category = {
+          $not: {
+            $in: [
+              Category.CHARACTERS,
+              Category.DRAMAS,
+              Category.COSMETICS,
+              Category.FASHION,
+              Category.MUSIC,
+              Category.FOOD,
+              Category.SPORTS,
+            ],
+          },
+        };
+      } else {
+        query.category = { $in: category };
+      }
     }
 
     const popups = await this.searchRepository.findFilteredPopups(
