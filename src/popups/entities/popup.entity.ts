@@ -23,14 +23,9 @@ export class Popup extends Document {
   fee: number;
 
   @Prop({
-    type: Map,
-    of: {
-      open: { type: String },
-      close: { type: String },
-      closed: { type: Boolean, default: false },
-    },
+    type: Object,
   })
-  operatingHours: Map<string, any>;
+  operatingHours: Record<string, any>;
 
   @Prop({
     type: {

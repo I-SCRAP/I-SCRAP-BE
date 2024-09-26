@@ -43,18 +43,54 @@ export class SearchRepository {
             isBookmarked: 1,
             dateRange: {
               start: {
-                $dateToString: {
-                  format: '%Y/%m/%d',
-                  date: '$dateRange.start',
-                  timezone: '+09:00',
-                },
+                $concat: [
+                  {
+                    $substr: [
+                      {
+                        $dateToString: {
+                          format: '%Y/%m/%d',
+                          date: '$dateRange.start',
+                          timezone: '+09:00',
+                        },
+                      },
+                      2,
+                      2,
+                    ],
+                  },
+                  '/',
+                  {
+                    $dateToString: {
+                      format: '%m/%d',
+                      date: '$dateRange.start',
+                      timezone: '+09:00',
+                    },
+                  },
+                ],
               },
               end: {
-                $dateToString: {
-                  format: '%Y/%m/%d',
-                  date: '$dateRange.end',
-                  timezone: '+09:00',
-                },
+                $concat: [
+                  {
+                    $substr: [
+                      {
+                        $dateToString: {
+                          format: '%Y/%m/%d',
+                          date: '$dateRange.end',
+                          timezone: '+09:00',
+                        },
+                      },
+                      2,
+                      2,
+                    ],
+                  },
+                  '/',
+                  {
+                    $dateToString: {
+                      format: '%m/%d',
+                      date: '$dateRange.end',
+                      timezone: '+09:00',
+                    },
+                  },
+                ],
               },
             },
           },
