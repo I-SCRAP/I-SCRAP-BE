@@ -26,7 +26,7 @@ export class User extends Document {
   icecreamCharacter: string;
 
   @Prop({ type: [String], default: [] }) // 카테고리 리스트로 정의
-  preferredCategory: string[];
+  preferredCategories: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

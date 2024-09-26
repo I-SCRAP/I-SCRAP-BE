@@ -27,7 +27,7 @@ export class AuthService {
         profileImage: picture,
         platform: 'google',
         icecreamCharacter: '', // 기본값으로 빈 문자열
-        preferredCategory: [], // 기본값으로 빈 배열
+        preferredCategories: [], // 기본값으로 빈 배열
       });
     }
 
