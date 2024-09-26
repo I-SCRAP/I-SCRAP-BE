@@ -1,3 +1,4 @@
+import { String } from './../../../node_modules/aws-sdk/clients/account.d';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
@@ -25,8 +26,8 @@ export class Review extends Document {
   @Prop({ type: Date, required: true })
   visitDate: Date;
 
-  @Prop({ type: Number, default: 0 })
-  amount: number;
+  @Prop({ type: String, default: '0' })
+  amount: string;
 
   @Prop({ type: String, default: '' })
   companions: string;
