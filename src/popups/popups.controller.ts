@@ -13,14 +13,13 @@ export class PopupsController {
     return this.popupsService.getPopupDetail(id);
   }
 
-  @UseGuards(JwtAuthGuard) // JwtAuthGuard 사용
+  @UseGuards(JwtAuthGuard)
   @Get('home/personalized-popups')
   async getPersonalizedPopups(@Req() req) {
-    // req.user는 JwtAuthGuard에서 인증된 사용자 정보가 추가된 객체
-    const userName = req.user?.name; // 인증된 사용자 정보에서 이름 추출
+    const userName = req.user?.name;
     const popups = await this.popupsService.getPersonalizedPopups();
     return {
-      userName, // 유저 이름을 응답에 포함
+      userName,
       popups,
     };
   }
