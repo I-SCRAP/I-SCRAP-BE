@@ -20,7 +20,7 @@ export class Popup extends Document {
   detailImages: string[];
 
   @Prop()
-  fee: number;
+  fee: string;
 
   @Prop({
     type: Object,

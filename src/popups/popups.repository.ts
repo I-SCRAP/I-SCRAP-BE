@@ -206,6 +206,9 @@ export class PopupsRepository {
     } else if (status === 'upcoming') {
       // 진행 예정인 팝업: 현재 날짜 < start
       matchCondition['dateRange.start'] = { $gt: currentDate };
+    } else if (status === 'finished') {
+      // 종료된 팝업: 현재 날짜 > end
+      matchCondition['dateRange.end'] = { $lt: currentDate };
     }
 
     // 필요한 필드만 선택하고, 날짜 형식 변환 + 페이지네이션 적용
@@ -305,9 +308,6 @@ export class PopupsRepository {
     const endOfMonth = new Date(
       Date.UTC(currentYear, currentMonth, 0, 23, 59, 59, 999),
     );
-
-    console.log('Start of Month:', startOfMonth);
-    console.log('End of Month:', endOfMonth);
 
     const popups = await this.popupModel.aggregate([
       {
