@@ -5,11 +5,13 @@ import { PopupsService } from './popups.service';
 import { PopupsRepository } from './popups.repository';
 import { Popup, PopupSchema } from './entities/popup.entity';
 import { BookmarksModule } from 'src/bookmarks/bookmarks.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Popup.name, schema: PopupSchema }]),
     forwardRef(() => BookmarksModule),
+    UsersModule,
   ],
   controllers: [PopupsController],
   providers: [PopupsService, PopupsRepository],
