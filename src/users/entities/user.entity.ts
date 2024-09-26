@@ -21,6 +21,12 @@ export class User extends Document {
 
   @Prop({ type: Date })
   createdDate: Date;
+
+  @Prop({ default: '' }) // 기본값은 빈 문자열
+  icecreamCharacter: string;
+
+  @Prop({ type: [String], default: [] }) // 카테고리 리스트로 정의
+  preferredCategory: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
