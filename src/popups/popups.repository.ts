@@ -309,9 +309,6 @@ export class PopupsRepository {
       Date.UTC(currentYear, currentMonth, 0, 23, 59, 59, 999),
     );
 
-    console.log('Start of Month:', startOfMonth);
-    console.log('End of Month:', endOfMonth);
-
     const popups = await this.popupModel.aggregate([
       {
         $match: {
