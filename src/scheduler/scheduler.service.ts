@@ -103,7 +103,10 @@ export class SchedulerService {
               user.email,
               '[iscrap] 팝업 스토어 오픈 알림',
               `
-                <b>${popup.name}</b>이 오늘 오픈합니다!<br/><br/>
+                <br/>
+                <b><a href="https://i-scrap-fe.vercel.app/popup/${popup._id}>${
+                popup.name
+              }</a></b>이 오늘 오픈합니다!<br/><br/>
                 안녕하세요, ${user.name}님!<br/>
                 새로운 팝업 스토어가 오픈합니다.🤩 <br/>
                 아래에서 팝업 스토어의 일정과 장소를 확인하세요.<br/><br/>
@@ -165,7 +168,10 @@ export class SchedulerService {
               user.email,
               '[iscrap] 팝업 스토어 종료 알림',
               `
-                <b>${popup.name}</b>이 일주일 뒤 종료됩니다.<br/><br/>
+                <br/>
+                <b><a href="https://i-scrap-fe.vercel.app/popup/${popup._id}">${
+                popup.name
+              }</a></b>이 일주일 뒤 종료됩니다.<br/><br/>
                 안녕하세요, ${user.name}님!<br/>
                 ${popup.name} 팝업 스토어가 종료까지 7일 남았습니다. 😢 <br/>
                 아직 방문하지 않으셨다면, 지금 방문해 보세요!<br/><br/>
