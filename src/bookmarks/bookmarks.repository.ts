@@ -94,4 +94,37 @@ export class BookmarksRepository {
     });
     return count;
   }
+
+  // 북마크가 있는 모든 사용자의 목록을 가져오는 메서드
+  async getAllUsersWithBookmarks(): Promise<
+    { userId: string; email: string }[]
+  > {
+    const usersWithBookmarks = await this.bookmarkModel.aggregate([
+      {
+        $group: {
+          _id: '$userId',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users', // users 컬렉션과 연결
+          localField: '_id',
+          foreignField: '_id', // userId로 users 컬렉션에서 매칭
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: '$_id',
+          email: '$user.email',
+        },
+      },
+    ]);
+
+    return usersWithBookmarks;
+  }
 }
