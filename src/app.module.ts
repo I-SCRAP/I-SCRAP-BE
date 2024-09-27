@@ -12,6 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { SearchModule } from './search/search.module';
 import { S3Module } from './s3/s3.module';
+import { PreferencesModule } from './preferences/preferences.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { S3Module } from './s3/s3.module';
     UsersModule,
     SearchModule,
     S3Module,
+    PreferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtAuthGuard],
