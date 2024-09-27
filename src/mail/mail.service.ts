@@ -15,13 +15,13 @@ export class MailService {
     });
   }
 
-  async sendEmail(to: string, subject: string, text: string) {
+  async sendEmail(to: string, subject: string, html: string) {
     try {
       const mailOptions = {
         from: process.env.GMAIL_USER,
         to,
         subject,
-        text,
+        html,
       };
       await this.transporter.sendMail(mailOptions);
       console.log(`Email sent to ${to}`);

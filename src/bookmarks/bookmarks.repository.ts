@@ -97,7 +97,7 @@ export class BookmarksRepository {
 
   // 북마크가 있는 모든 사용자의 목록을 가져오는 메서드
   async getAllUsersWithBookmarks(): Promise<
-    { userId: string; email: string }[]
+    { userId: string; email: string; name: string }[]
   > {
     const usersWithBookmarks = await this.bookmarkModel.aggregate([
       {
@@ -121,6 +121,7 @@ export class BookmarksRepository {
           _id: 0,
           userId: '$_id',
           email: '$user.email',
+          name: '$user.name',
         },
       },
     ]);

@@ -83,7 +83,7 @@ export class BookmarksService {
 
   // 북마크가 있는 모든 사용자 목록을 반환
   async getAllUsersWithBookmarks(): Promise<
-    { userId: string; email: string }[]
+    { userId: string; email: string; name: string }[]
   > {
     return this.bookmarksRepository.getAllUsersWithBookmarks();
   }
