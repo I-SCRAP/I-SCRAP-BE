@@ -34,6 +34,8 @@ jobs:
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
           echo "PROD_FRONTEND_URL=${{ secrets.PROD_FRONTEND_URL }}" >> .env
+          echo "GMAIL_USER=${{ secrets.GMAIL_USER }}" >> .env
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> .env
       - name: serverless deploy
         uses: serverless/github-action@v3.2
         with:
