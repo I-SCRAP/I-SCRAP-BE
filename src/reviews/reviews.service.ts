@@ -48,7 +48,7 @@ export class ReviewsService {
       review.cardFront,
     );
 
-    review[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+    review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
       process.env.S3_USER_BUCKET,
       userId,
       review.cardBack,
