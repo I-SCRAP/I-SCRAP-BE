@@ -17,7 +17,7 @@ export enum Category {
   CHARACTERS = '캐릭터',
   SPORTS = '스포츠',
   DRAMAS = '드라마',
-  COSMETICS = '화장품',
+  COSMETICS = '뷰티',
   FASHION = '패션',
   MUSIC = '음악',
   FOOD = '음식',

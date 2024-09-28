@@ -12,6 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { SearchModule } from './search/search.module';
 import { S3Module } from './s3/s3.module';
+import { PreferencesModule } from './preferences/preferences.module';
 import { MailModule } from './mail/mail.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule'; // 스케줄 모듈 임포트
@@ -36,6 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule'; // 스케줄 모듈 임포트
     UsersModule,
     SearchModule,
     S3Module,
+    PreferencesModule,
     MailModule,
     SchedulerModule,
   ],
