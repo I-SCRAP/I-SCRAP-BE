@@ -18,6 +18,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { ReviewLike } from './entities/review-like.entity';
 import { DeleteReviewsDto } from './dto/delete-reviews.dto';
+import { Popup } from 'src/popups/entities/popup.entity';
 
 @Injectable()
 export class ReviewsRepository {
@@ -28,6 +29,7 @@ export class ReviewsRepository {
     private readonly subCommentModel: Model<SubComment>,
     @InjectModel(ReviewLike.name)
     private readonly reviewLikeModel: Model<ReviewLike>,
+    @InjectModel(Popup.name) private readonly popupModel: Model<Popup>,
   ) {}
 
   async getAllReviews(userId: string, page: number) {
@@ -185,14 +187,30 @@ export class ReviewsRepository {
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
-    // [TODO] popupId가 존재하는지 확인, 존재하지 않으면 에러 발생
-    // [TODO] 이미 리뷰가 존재하는지 확인, 존재하면 에러 발생
+    const popup = await this.popupModel.findOne({
+      _id: createReviewDto.popupId,
+    });
 
-    await this.reviewModel.create({
+    if (!popup) {
+      throw new NotFoundException('Popup not found');
+    }
+
+    const review = await this.reviewModel.findOne({
+      userId: new ObjectId(userId),
+      popupId: createReviewDto.popupId,
+    });
+
+    if (review) {
+      throw new ConflictException('Review already exists');
+    }
+
+    const createdReview = await this.reviewModel.create({
       ...createReviewDto,
       cardFront: createReviewDto.cardImage,
       userId: new ObjectId(userId),
     });
+    const reviewId = createdReview._id;
+    return reviewId;
   }
 
   async updateReview(
