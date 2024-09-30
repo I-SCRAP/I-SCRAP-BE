@@ -37,23 +37,21 @@ export class SearchService {
     }
 
     const locationMappings: { [key: string]: Location } = {
-      잠실: Location.JAMSIL,
+      전체: Location.ALL_REGIONS,
       송파구: Location.JAMSIL,
-      성수: Location.SEONGSU,
       성동구: Location.SEONGSU,
-      홍대: Location.HONGDAE,
       마포구: Location.HONGDAE,
-      더현대: Location.THEHYUNDAI,
-      영등포구: Location.THEHYUNDAI,
-      용산구: Location.YONGSAN,
       종로: Location.JONGNO,
+      용산구: Location.YONGSAN,
+      영등포구: Location.THEHYUNDAI,
+      경기도: Location.GYEONGGI_REGION,
     };
 
     const mappedLocationNames = Object.keys(locationMappings);
-    const mapLocation = (inputLocation: string): Location | null => {
+    const mapLocation = (inputLocation: string): string | null => {
       for (const key in locationMappings) {
-        if (inputLocation.includes(key)) {
-          return locationMappings[key];
+        if (inputLocation.includes(locationMappings[key])) {
+          return key;
         }
       }
       return null;
@@ -68,7 +66,6 @@ export class SearchService {
       if (validLocations.includes(Location.ALL_REGIONS)) {
         delete query['location.address'];
       } else if (validLocations.length === 0) {
-        console.log('validLocations.length === 0');
         query['location.address'] = {
           $not: {
             $regex: `(${mappedLocationNames.join('|')})`,
