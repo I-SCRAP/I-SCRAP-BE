@@ -16,6 +16,8 @@ import { PreferencesModule } from './preferences/preferences.module';
 import { MailModule } from './mail/mail.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { ScheduleModule } from '@nestjs/schedule'; // 스케줄 모듈 임포트
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -40,8 +42,21 @@ import { ScheduleModule } from '@nestjs/schedule'; // 스케줄 모듈 임포트
     PreferencesModule,
     MailModule,
     SchedulerModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService, JwtAuthGuard],
+  providers: [
+    AppService,
+    JwtAuthGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
