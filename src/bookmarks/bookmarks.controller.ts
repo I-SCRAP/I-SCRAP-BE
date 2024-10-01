@@ -12,23 +12,25 @@ import { BookmarksService } from './bookmarks.service';
 import { Popup } from 'src/popups/entities/popup.entity';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('bookmarks')
 export class BookmarksController {
   constructor(private readonly bookmarkService: BookmarksService) {}
 
   @Get('popups')
-  async getBookmarkedPopups(): Promise<Popup[]> {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+  async getBookmarkedPopups(@Req() req): Promise<Popup[]> {
+    const userId = req.user.id;
     return this.bookmarkService.getBookmarkedPopups(userId);
   }
 
   @Get('bookmarked-popups')
   async getAllBookmarkedPopups(
+    @Req() req,
     @Query('page') page: string = '1', // 기본값 1
     @Query('limit') limit: string = '12', // 기본값 12
     @Query('status') status: string = 'all', // 기본값 'all'
   ): Promise<Popup[]> {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+    const userId = req.user.id;
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
@@ -43,10 +45,11 @@ export class BookmarksController {
 
   @Get('date-range')
   async getPopupsInDateRange(
+    @Req() req,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ): Promise<Popup[]> {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+    const userId = req.user.id;
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -55,10 +58,11 @@ export class BookmarksController {
 
   @Get('monthly')
   async getPopupsInMonth(
+    @Req() req,
     @Query('year') year: string,
     @Query('month') month: string,
   ): Promise<Popup[]> {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+    const userId = req.user.id;
     const yearNumber = parseInt(year, 10);
     const monthNumber = parseInt(month, 10);
 
@@ -79,9 +83,10 @@ export class BookmarksController {
 
   @Post('unbookmark')
   async unbookmarkPopups(
+    @Req() req,
     @Body('popupIds') popupIds: string[],
   ): Promise<{ message: string }> {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+    const userId = req.user.id;
     if (!popupIds || popupIds.length === 0) {
       return { message: 'No popup IDs provided' };
     }
@@ -91,8 +96,8 @@ export class BookmarksController {
   }
 
   @Post('/:popupId')
-  async toggleBookmark(@Param('popupId') popupId: string) {
-    const userId = '66f58849558783d05810be3b';
+  async toggleBookmark(@Req() req, @Param('popupId') popupId: string) {
+    const userId = req.user.id;
     const message = await this.bookmarkService.toggleBookmark(userId, popupId);
     return { message };
   }
