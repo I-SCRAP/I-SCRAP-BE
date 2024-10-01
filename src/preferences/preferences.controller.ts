@@ -1,14 +1,19 @@
-import { Controller, Get, Body, Patch } from '@nestjs/common';
+import { Controller, Get, Body, Patch, UseGuards, Req } from '@nestjs/common';
 import { PreferencesService } from './preferences.service';
 import { UpdatePreferenceDto } from './dto/update-preference.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('preferences')
 export class PreferencesController {
   constructor(private readonly preferencesService: PreferencesService) {}
 
   @Patch()
-  updatePreference(@Body() updatePreferenceDto: UpdatePreferenceDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  updatePreference(
+    @Req() req,
+    @Body() updatePreferenceDto: UpdatePreferenceDto,
+  ) {
+    const userId = req.user.id;
     return this.preferencesService.updatePreference(
       userId,
       updatePreferenceDto,
@@ -16,14 +21,14 @@ export class PreferencesController {
   }
 
   @Get()
-  getPreference() {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getPreference(@Req() req) {
+    const userId = req.user.id;
     return this.preferencesService.getPreference(userId);
   }
 
   @Get('character')
-  getPreferenceCharacter() {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getPreferenceCharacter(@Req() req) {
+    const userId = req.user.id;
     return this.preferencesService.getPreferenceCharacter(userId);
   }
 }
