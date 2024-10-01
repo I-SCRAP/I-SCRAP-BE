@@ -48,7 +48,7 @@ export class ReviewsService {
       review.cardFront,
     );
 
-    review[0].cardBack = await this.s3Service.generatePresignedDownloadUrl(
+    review.cardBack = await this.s3Service.generatePresignedDownloadUrl(
       process.env.S3_USER_BUCKET,
       userId,
       review.cardBack,
@@ -66,7 +66,11 @@ export class ReviewsService {
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
-    await this.reviewsRepository.createDefaultReview(userId, createReviewDto);
+    const defaultReviewId = await this.reviewsRepository.createDefaultReview(
+      userId,
+      createReviewDto,
+    );
+    return defaultReviewId;
   }
 
   async updateReview(

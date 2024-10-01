@@ -20,12 +20,19 @@ export class Popup extends Document {
   detailImages: string[];
 
   @Prop()
-  fee: number;
+  fee: string;
 
   @Prop({
     type: Object,
   })
-  operatingHours: Record<string, any>;
+  operatingHours: Record<
+    string,
+    {
+      open?: string;
+      close?: string;
+      closed?: boolean;
+    }
+  >;
 
   @Prop({
     type: {

@@ -55,6 +55,27 @@ export class S3Service {
     }
   }
 
+  async generatePresignedDownloadUrlForPublicFile(
+    bucket: string,
+    fileName: string,
+  ): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: fileName,
+    });
+
+    try {
+      const presignedUrl = await getSignedUrl(this.s3, command, {
+        expiresIn: 3600,
+      });
+      return presignedUrl;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Failed to generate presigned URL for download',
+      );
+    }
+  }
+
   async deleteFile(bucket: string, userId: string, fileName: string) {
     try {
       await this.s3.send(

@@ -25,8 +25,8 @@ export class Review extends Document {
   @Prop({ type: Date, required: true })
   visitDate: Date;
 
-  @Prop({ type: Number, default: 0 })
-  amount: number;
+  @Prop({ type: String, default: '0' })
+  amount: string;
 
   @Prop({ type: String, default: '' })
   companions: string;
@@ -68,9 +68,12 @@ export class Review extends Document {
         content: { type: String },
         sticker_id: { type: String },
         font: { type: String },
-        size: { type: String },
+        size: { type: Object },
         color: { type: String },
-        position: { type: String },
+        position: {
+          x: { type: Number },
+          y: { type: Number },
+        },
         rotation: { type: String },
       },
     ],
@@ -81,9 +84,9 @@ export class Review extends Document {
     content?: string;
     sticker_id?: string;
     font?: string;
-    size?: string;
+    size?: number | { width: number; height: number };
     color?: string;
-    position?: string;
+    position?: { x: number; y: number };
     rotation?: string;
   }[];
 }

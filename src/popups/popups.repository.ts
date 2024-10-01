@@ -3,11 +3,13 @@ import { Popup } from './entities/popup.entity'; // Popup 엔티티를 정의한
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class PopupsRepository {
   constructor(
     @InjectModel(Popup.name) private readonly popupModel: Model<Popup>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async getPopupDetail(popupId: string) {
@@ -97,6 +99,7 @@ export class PopupsRepository {
                 cardFront: '$$review.cardFront', // cardFront 이미지
                 rating: '$$review.rating', // 평점
                 shortComment: '$$review.shortComment', // 짧은 코멘트
+                userId: '$$review.userId', // 리뷰 작성자의 userId 필드
                 reviewLikes: '$reviewLikesCount', // 좋아요 수
                 comments: '$commentsCount', // 모든 코멘트(댓글 + 서브 댓글) 합산
               },
@@ -115,7 +118,11 @@ export class PopupsRepository {
     // operatingHours의 정확한 타입 지정
     const operatingHours = popup.operatingHours as Record<
       string,
-      { open?: string; close?: string; closed?: boolean }
+      {
+        open?: string;
+        close?: string;
+        closed?: boolean;
+      }
     >;
 
     // 영어 요일을 한글 요일로 변환하는 맵
@@ -129,45 +136,80 @@ export class PopupsRepository {
       Sunday: '일',
     };
 
-    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    const weekdayHours = operatingHours[weekdays[0]];
+    // 요일별 운영 시간이 동일한지 확인
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const firstDay = operatingHours[weekdays[0]];
 
-    const allWeekdaysSame = weekdays.every(
-      (day) =>
-        operatingHours[day]?.open === weekdayHours?.open &&
-        operatingHours[day]?.close === weekdayHours?.close,
-    );
+    const allDaysSame = weekdays.every((day) => {
+      const hours = operatingHours[day];
+      return (
+        hours?.open === firstDay?.open &&
+        hours?.close === firstDay?.close &&
+        !hours?.closed
+      );
+    });
 
-    if (
-      (allWeekdaysSame &&
-        !(
-          operatingHours.Saturday?.open === weekdayHours.open &&
-          operatingHours.Saturday?.close === weekdayHours.close
-        )) ||
-      operatingHours.Sunday?.closed
-    ) {
-      // 요일별로 운영 시간을 개별적으로 표시
-      const days = Object.entries(operatingHours)
-        .map(([day, hours]) => {
-          const koreanDay = dayMap[day]; // 영어 요일을 한글로 변환
-          if (hours?.closed) {
-            return `${koreanDay} 휴무`; // 휴무일 표시
-          }
-          return `${koreanDay} ${hours?.open}-${hours?.close}`; // 요일별 시간 표시
-        })
-        .join('\n');
+    let operatingDays: string;
 
-      popup.operatingHours = days;
+    if (allDaysSame && firstDay?.open && firstDay?.close) {
+      // 모든 요일의 운영 시간이 동일하면 "매일"로 표시
+      operatingDays = `매일: ${firstDay.open}-${firstDay.close}`;
     } else {
-      // 모든 요일이 동일하면 "매일"로 표시
-      popup.operatingHours = `매일 ${weekdayHours.open}-${weekdayHours.close}`;
+      // 요일별로 운영 시간이 다를 경우 각각 표시
+      operatingDays = Object.entries(operatingHours)
+        .map(([day, hours]) => {
+          const koreanDay = dayMap[day];
+
+          if (!koreanDay) {
+            return ''; // 잘못된 요일은 무시
+          }
+
+          // 운영 시간이 없는 경우 처리
+          if (!hours?.open || !hours?.close) {
+            return `${koreanDay}: 운영 시간 정보 없음`;
+          }
+
+          if (hours?.closed) {
+            return `${koreanDay}: 휴무`;
+          }
+
+          return `${koreanDay}: ${hours.open}-${hours.close}`;
+        })
+        .filter((entry) => entry !== '') // 빈 값 제거
+        .join('\n');
     }
 
+    // 추가 정보가 있는 경우 처리
+    if (operatingHours.additionalInfo) {
+      operatingDays += `\n추가 정보: ${operatingHours.additionalInfo}`;
+    }
+
+    popup.operatingHours = operatingDays;
+
     // fee 값 처리
-    if (popup.fee === 0) {
+    if (popup.fee === '0' || 0) {
       popup.fee = '무료';
     } else {
-      popup.fee = `${popup.fee}원`;
+      popup.fee = `${popup.fee}`;
+    }
+
+    // cardFront 이미지에 presigned URL 생성
+    for (const review of popup.reviews) {
+      if (review.cardFront) {
+        review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          review.userId,
+          review.cardFront,
+        );
+      }
     }
 
     return popup;
@@ -206,6 +248,9 @@ export class PopupsRepository {
     } else if (status === 'upcoming') {
       // 진행 예정인 팝업: 현재 날짜 < start
       matchCondition['dateRange.start'] = { $gt: currentDate };
+    } else if (status === 'finished') {
+      // 종료된 팝업: 현재 날짜 > end
+      matchCondition['dateRange.end'] = { $lt: currentDate };
     }
 
     // 필요한 필드만 선택하고, 날짜 형식 변환 + 페이지네이션 적용
@@ -305,9 +350,6 @@ export class PopupsRepository {
     const endOfMonth = new Date(
       Date.UTC(currentYear, currentMonth, 0, 23, 59, 59, 999),
     );
-
-    console.log('Start of Month:', startOfMonth);
-    console.log('End of Month:', endOfMonth);
 
     const popups = await this.popupModel.aggregate([
       {

@@ -12,9 +12,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { SearchModule } from './search/search.module';
 import { S3Module } from './s3/s3.module';
+import { PreferencesModule } from './preferences/preferences.module';
+import { MailModule } from './mail/mail.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
+import { ScheduleModule } from '@nestjs/schedule'; // 스케줄 모듈 임포트
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(), // 스케줄러 활성화
     JwtModule.register({
       secret: process.env.JWT_KEY, // JWT 시크릿 키
       signOptions: { expiresIn: '1d' }, // JWT 토큰 유효 기간 1일
@@ -32,8 +39,24 @@ import { S3Module } from './s3/s3.module';
     UsersModule,
     SearchModule,
     S3Module,
+    PreferencesModule,
+    MailModule,
+    SchedulerModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService, JwtAuthGuard],
+  providers: [
+    AppService,
+    JwtAuthGuard,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

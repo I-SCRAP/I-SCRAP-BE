@@ -86,4 +86,46 @@ export class BookmarksRepository {
       throw new Error('No bookmarks found to delete');
     }
   }
+
+  // 특정 사용자가 북마크한 총 개수를 반환하는 메서드
+  async countUserBookmarks(userId: string): Promise<number> {
+    const count = await this.bookmarkModel.countDocuments({
+      userId: new ObjectId(userId),
+    });
+    return count;
+  }
+
+  // 북마크가 있는 모든 사용자의 목록을 가져오는 메서드
+  async getAllUsersWithBookmarks(): Promise<
+    { userId: string; email: string; name: string }[]
+  > {
+    const usersWithBookmarks = await this.bookmarkModel.aggregate([
+      {
+        $group: {
+          _id: '$userId',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users', // users 컬렉션과 연결
+          localField: '_id',
+          foreignField: '_id', // userId로 users 컬렉션에서 매칭
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: '$_id',
+          email: '$user.email',
+          name: '$user.name',
+        },
+      },
+    ]);
+
+    return usersWithBookmarks;
+  }
 }

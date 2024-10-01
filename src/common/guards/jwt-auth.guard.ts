@@ -45,6 +45,8 @@ export class JwtAuthGuard implements CanActivate {
         profileImage: user.profileImage, // 프로필 이미지
         platform: user.platform,
         notification: user.notification,
+        icecreamCharacter: user.icecreamCharacter, // 추가된 필드
+        preferredCategories: user.preferredCategories,
         createdDate: user.createdDate,
       };
 

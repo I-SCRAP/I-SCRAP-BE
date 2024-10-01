@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { PopupsService } from './popups.service';
 import { validateRequiredField } from 'src/utils/validation-utils';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('popups')
 export class PopupsController {
@@ -12,9 +13,15 @@ export class PopupsController {
     return this.popupsService.getPopupDetail(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('home/personalized-popups')
-  getPersonalizedPopups() {
-    return this.popupsService.getPersonalizedPopups();
+  async getPersonalizedPopups(@Req() req) {
+    const userName = req.user?.name;
+    const popups = await this.popupsService.getPersonalizedPopups();
+    return {
+      userName,
+      popups,
+    };
   }
 
   @Get('monthly')
