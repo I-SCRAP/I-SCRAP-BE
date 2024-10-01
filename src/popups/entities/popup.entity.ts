@@ -25,7 +25,14 @@ export class Popup extends Document {
   @Prop({
     type: Object,
   })
-  operatingHours: Record<string, any>;
+  operatingHours: Record<
+    string,
+    {
+      open?: string;
+      close?: string;
+      closed?: boolean;
+    }
+  >;
 
   @Prop({
     type: {

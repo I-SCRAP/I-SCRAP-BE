@@ -12,7 +12,7 @@ export class SchedulerService {
     private readonly mailService: MailService,
   ) {}
 
-  @Cron('0 0 * * *') // 매일 자정에 실행 //@Cron('*/10 * * * * *') // 매 10초마다 실행
+  @Cron('0 9 * * *') // 매일 오전 9시에 실행 //@Cron('*/10 * * * * *') // 매 10초마다 실행
   async handleCron() {
     console.log('Scheduler 실행됨:', new Date().toLocaleString()); // 스케줄러 실행 확인 로그
 
