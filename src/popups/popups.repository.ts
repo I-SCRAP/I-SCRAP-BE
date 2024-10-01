@@ -3,11 +3,13 @@ import { Popup } from './entities/popup.entity'; // Popup 엔티티를 정의한
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class PopupsRepository {
   constructor(
     @InjectModel(Popup.name) private readonly popupModel: Model<Popup>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async getPopupDetail(popupId: string) {
@@ -97,6 +99,7 @@ export class PopupsRepository {
                 cardFront: '$$review.cardFront', // cardFront 이미지
                 rating: '$$review.rating', // 평점
                 shortComment: '$$review.shortComment', // 짧은 코멘트
+                userId: '$$review.userId', // 리뷰 작성자의 userId 필드
                 reviewLikes: '$reviewLikesCount', // 좋아요 수
                 comments: '$commentsCount', // 모든 코멘트(댓글 + 서브 댓글) 합산
               },
@@ -196,6 +199,17 @@ export class PopupsRepository {
       popup.fee = '무료';
     } else {
       popup.fee = `${popup.fee}`;
+    }
+
+    // cardFront 이미지에 presigned URL 생성
+    for (const review of popup.reviews) {
+      if (review.cardFront) {
+        review.cardFront = await this.s3Service.generatePresignedDownloadUrl(
+          process.env.S3_USER_BUCKET,
+          review.userId,
+          review.cardFront,
+        );
+      }
     }
 
     return popup;
