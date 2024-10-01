@@ -102,7 +102,6 @@ export class SearchRepository {
   async sortPopups(popups: Popup[], sortBy: SortBy): Promise<Popup[]> {
     if (sortBy === SortBy.POPULARITY) {
       const popupIds = popups.map((popup) => popup.id);
-      console.log(popupIds);
       const bookmarks = await this.bookmarkModel
         .aggregate([
           { $match: { popupId: { $in: popupIds } } },

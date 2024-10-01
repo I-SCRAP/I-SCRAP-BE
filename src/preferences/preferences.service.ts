@@ -37,8 +37,6 @@ export class PreferencesService {
         `icecreamCharacter/${icecreamCharacter}.svg`,
       );
 
-    console.log(icecreamCharacterImage);
-
     return icecreamCharacterImage;
   }
 }
