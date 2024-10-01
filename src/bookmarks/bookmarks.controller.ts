@@ -18,9 +18,13 @@ export class BookmarksController {
   constructor(private readonly bookmarkService: BookmarksService) {}
 
   @Get('popups')
-  async getBookmarkedPopups(@Req() req): Promise<Popup[]> {
+  async getBookmarkedPopups(
+    @Req() req,
+  ): Promise<{ userName: string; popups: Popup[] }> {
     const userId = req.user.id;
-    return this.bookmarkService.getBookmarkedPopups(userId);
+    const userName = req.user.name;
+    const popups = await this.bookmarkService.getBookmarkedPopups(userId);
+    return { userName, popups };
   }
 
   @Get('bookmarked-popups')
