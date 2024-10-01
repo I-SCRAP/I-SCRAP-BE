@@ -92,7 +92,7 @@ export class BookmarksController {
 
   @Post('/:popupId')
   async toggleBookmark(@Param('popupId') popupId: string) {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+    const userId = '66f58849558783d05810be3b';
     const message = await this.bookmarkService.toggleBookmark(userId, popupId);
     return { message };
   }

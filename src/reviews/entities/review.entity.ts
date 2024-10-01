@@ -1,4 +1,3 @@
-import { String } from './../../../node_modules/aws-sdk/clients/account.d';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Document } from 'mongoose';
@@ -69,9 +68,12 @@ export class Review extends Document {
         content: { type: String },
         sticker_id: { type: String },
         font: { type: String },
-        size: { type: String },
+        size: { type: Object },
         color: { type: String },
-        position: { type: String },
+        position: {
+          x: { type: Number },
+          y: { type: Number },
+        },
         rotation: { type: String },
       },
     ],
@@ -82,9 +84,9 @@ export class Review extends Document {
     content?: string;
     sticker_id?: string;
     font?: string;
-    size?: string;
+    size?: number | { width: number; height: number };
     color?: string;
-    position?: string;
+    position?: { x: number; y: number };
     rotation?: string;
   }[];
 }

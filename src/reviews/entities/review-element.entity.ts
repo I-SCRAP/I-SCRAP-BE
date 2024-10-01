@@ -5,7 +5,6 @@ import {
   IsObject,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 
 export class TextElement {
@@ -26,7 +25,6 @@ export class TextElement {
 
   @Type(() => Object)
   @IsObject()
-  @ValidateNested()
   position: {
     x: number;
     y: number;
@@ -46,7 +44,6 @@ export class StickerElement {
 
   @Type(() => Object)
   @IsObject()
-  @ValidateNested()
   size: {
     width: number;
     height: number;
@@ -58,7 +55,6 @@ export class StickerElement {
 
   @Type(() => Object)
   @IsObject()
-  @ValidateNested()
   position: {
     x: number;
     y: number;
