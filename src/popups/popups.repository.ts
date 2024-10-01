@@ -115,7 +115,11 @@ export class PopupsRepository {
     // operatingHours의 정확한 타입 지정
     const operatingHours = popup.operatingHours as Record<
       string,
-      { open?: string; close?: string; closed?: boolean }
+      {
+        open?: string;
+        close?: string;
+        closed?: boolean;
+      }
     >;
 
     // 영어 요일을 한글 요일로 변환하는 맵
@@ -129,39 +133,63 @@ export class PopupsRepository {
       Sunday: '일',
     };
 
-    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    const weekdayHours = operatingHours[weekdays[0]];
+    // 요일별 운영 시간이 동일한지 확인
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const firstDay = operatingHours[weekdays[0]];
 
-    const allWeekdaysSame = weekdays.every(
-      (day) =>
-        operatingHours[day]?.open === weekdayHours?.open &&
-        operatingHours[day]?.close === weekdayHours?.close,
-    );
+    const allDaysSame = weekdays.every((day) => {
+      const hours = operatingHours[day];
+      return (
+        hours?.open === firstDay?.open &&
+        hours?.close === firstDay?.close &&
+        !hours?.closed
+      );
+    });
 
-    if (
-      (allWeekdaysSame &&
-        !(
-          operatingHours.Saturday?.open === weekdayHours.open &&
-          operatingHours.Saturday?.close === weekdayHours.close
-        )) ||
-      operatingHours.Sunday?.closed
-    ) {
-      // 요일별로 운영 시간을 개별적으로 표시
-      const days = Object.entries(operatingHours)
-        .map(([day, hours]) => {
-          const koreanDay = dayMap[day]; // 영어 요일을 한글로 변환
-          if (hours?.closed) {
-            return `${koreanDay} 휴무`; // 휴무일 표시
-          }
-          return `${koreanDay} ${hours?.open}-${hours?.close}`; // 요일별 시간 표시
-        })
-        .join('\n');
+    let operatingDays: string;
 
-      popup.operatingHours = days;
+    if (allDaysSame && firstDay?.open && firstDay?.close) {
+      // 모든 요일의 운영 시간이 동일하면 "매일"로 표시
+      operatingDays = `매일: ${firstDay.open}-${firstDay.close}`;
     } else {
-      // 모든 요일이 동일하면 "매일"로 표시
-      popup.operatingHours = `매일 ${weekdayHours.open}-${weekdayHours.close}`;
+      // 요일별로 운영 시간이 다를 경우 각각 표시
+      operatingDays = Object.entries(operatingHours)
+        .map(([day, hours]) => {
+          const koreanDay = dayMap[day];
+
+          if (!koreanDay) {
+            return ''; // 잘못된 요일은 무시
+          }
+
+          // 운영 시간이 없는 경우 처리
+          if (!hours?.open || !hours?.close) {
+            return `${koreanDay}: 운영 시간 정보 없음`;
+          }
+
+          if (hours?.closed) {
+            return `${koreanDay}: 휴무`;
+          }
+
+          return `${koreanDay}: ${hours.open}-${hours.close}`;
+        })
+        .filter((entry) => entry !== '') // 빈 값 제거
+        .join('\n');
     }
+
+    // 추가 정보가 있는 경우 처리
+    if (operatingHours.additionalInfo) {
+      operatingDays += `\n추가 정보: ${operatingHours.additionalInfo}`;
+    }
+
+    popup.operatingHours = operatingDays;
 
     // fee 값 처리
     if (popup.fee === '0' || 0) {
