@@ -81,7 +81,7 @@ export class AuthController {
     res.cookie('id_token', id_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
-      maxAge: 1000 * 60 * 60 * 24, // 1일 (24시간)
+      maxAge: 1000 * 60 * 60, // 1시간 (3600초) -> 구글 보안에 맞춰 1시간으로 설정
       sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 크로스사이트에서 쿠키 전송을 허용, 로컬 환경에서는 Lax로 설정
     });
 
@@ -89,7 +89,7 @@ export class AuthController {
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 (7일간 유효)
+      maxAge: 1000 * 60 * 60, // 1시간 (3600초) -> 구글 보안에 맞춰 1시간으로 설정
       sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // 크로스사이트에서 쿠키 전송을 허용, 로컬 환경에서는 Lax로 설정
     });
 
@@ -164,8 +164,8 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req) {
     // req.user는 JwtAuthGuard에서 인증된 사용자 정보가 추가된 객체
-    console.log(req.user);
-    return req.user; // 인증된 사용자 정보를 반환
+    console.log(req.user.id);
+    return req.user.name; // 인증된 사용자 정보를 반환
   }
 
   // 로그아웃 처리: 쿠키에서 토큰 제거
