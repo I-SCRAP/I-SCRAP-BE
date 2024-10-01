@@ -164,10 +164,10 @@ export class PopupsRepository {
     }
 
     // fee 값 처리
-    if (popup.fee === 0) {
+    if (popup.fee === '0' || 0) {
       popup.fee = '무료';
     } else {
-      popup.fee = `${popup.fee}원`;
+      popup.fee = `${popup.fee}`;
     }
 
     return popup;
