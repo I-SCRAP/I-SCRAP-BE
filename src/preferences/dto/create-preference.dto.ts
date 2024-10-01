@@ -11,7 +11,7 @@ export const flavorList = [
   'green-tea',
   'marshmallow',
   'mint-choco',
-  'peach-yogurt',
+  'pistachio',
   'peach',
   'shooting-star',
   'strawberry',
