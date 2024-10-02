@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
@@ -21,6 +22,13 @@ export class BookmarksController {
   async getBookmarkedPopups(
     @Req() req,
   ): Promise<{ userName: string; popups: Popup[] }> {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     const userName = req.user.name;
     const popups = await this.bookmarkService.getBookmarkedPopups(userId);
@@ -34,6 +42,13 @@ export class BookmarksController {
     @Query('limit') limit: string = '12', // 기본값 12
     @Query('status') status: string = 'all', // 기본값 'all'
   ): Promise<Popup[]> {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
@@ -53,6 +68,13 @@ export class BookmarksController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ): Promise<Popup[]> {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -66,6 +88,13 @@ export class BookmarksController {
     @Query('year') year: string,
     @Query('month') month: string,
   ): Promise<Popup[]> {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     const yearNumber = parseInt(year, 10);
     const monthNumber = parseInt(month, 10);
@@ -90,6 +119,13 @@ export class BookmarksController {
     @Req() req,
     @Body('popupIds') popupIds: string[],
   ): Promise<{ message: string }> {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     if (!popupIds || popupIds.length === 0) {
       return { message: 'No popup IDs provided' };
@@ -101,6 +137,13 @@ export class BookmarksController {
 
   @Post('/:popupId')
   async toggleBookmark(@Req() req, @Param('popupId') popupId: string) {
+    // req.user가 존재하지 않으면 UnauthorizedException 던지기
+    if (!req.user) {
+      throw new UnauthorizedException(
+        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
+      );
+    }
+
     const userId = req.user.id;
     const message = await this.bookmarkService.toggleBookmark(userId, popupId);
     return { message };
