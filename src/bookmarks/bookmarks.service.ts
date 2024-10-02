@@ -76,11 +76,6 @@ export class BookmarksService {
     );
   }
 
-  // 북마크 총 개수를 반환하는 메서드 추가
-  async countUserBookmarks(userId: string): Promise<number> {
-    return this.bookmarksRepository.countUserBookmarks(userId);
-  }
-
   // 북마크가 있는 모든 사용자 목록을 반환
   async getAllUsersWithBookmarks(): Promise<
     { userId: string; email: string; name: string }[]

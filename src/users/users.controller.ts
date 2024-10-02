@@ -7,15 +7,11 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
-import { BookmarksService } from 'src/bookmarks/bookmarks.service';
 import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly bookmarksService: BookmarksService, // BookmarksService 주입
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
@@ -33,9 +29,7 @@ export class UsersController {
     const reviewStats = await this.usersService.getUserReviewStats(user.id);
 
     // 유저가 북마크한 팝업 개수 가져오기
-    const bookmarkCount = await this.bookmarksService.countUserBookmarks(
-      user.id,
-    );
+    const bookmarkCount = await this.usersService.countUserBookmarks(user.id);
 
     return {
       email: user.email,
