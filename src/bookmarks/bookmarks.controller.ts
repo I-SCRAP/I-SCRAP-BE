@@ -114,7 +114,7 @@ export class BookmarksController {
     );
   }
 
-  @Post('unbookmark')
+  @Get('unbookmark')
   async unbookmarkPopups(
     @Req() req,
     @Body('popupIds') popupIds: string[],
@@ -135,7 +135,7 @@ export class BookmarksController {
     return { message: 'Bookmarks removed successfully' };
   }
 
-  @Post('/:popupId')
+  @Get('/:popupId')
   async toggleBookmark(@Req() req, @Param('popupId') popupId: string) {
     // req.user가 존재하지 않으면 UnauthorizedException 던지기
     if (!req.user) {
