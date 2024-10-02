@@ -237,12 +237,25 @@ export class ReviewsRepository {
   }
 
   async getTextReview(userId: string, reviewId: string) {
+    const userIdofReview = await this.reviewModel.findOne(
+      {
+        _id: new ObjectId(reviewId),
+      },
+      { userId: 1 },
+    );
+
+    if (!userIdofReview) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const matchCondition =
+      !userId || userId.toString() !== userIdofReview.userId.toString()
+        ? { _id: new ObjectId(reviewId), isPublic: true }
+        : { _id: new ObjectId(reviewId), userId: new ObjectId(userId) };
+
     const textReview = await this.reviewModel.aggregate([
       {
-        $match: {
-          _id: new ObjectId(reviewId),
-          userId: new ObjectId(userId),
-        },
+        $match: matchCondition,
       },
       {
         $lookup: {
