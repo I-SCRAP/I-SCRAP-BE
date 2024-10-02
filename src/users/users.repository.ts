@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { Review } from 'src/reviews/entities/review.entity';
 import { ReviewLike } from 'src/reviews/entities/review-like.entity';
 import { ObjectId } from 'mongodb';
+import { Bookmark } from 'src/bookmarks/entities/bookmarks.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -13,6 +14,8 @@ export class UsersRepository {
     @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
     @InjectModel(ReviewLike.name)
     private readonly reviewLikeModel: Model<ReviewLike>,
+    @InjectModel(Bookmark.name)
+    private readonly bookmarkModel: Model<Bookmark>,
   ) {}
 
   async findOneGetByEmail(email: string): Promise<User | null> {
@@ -49,5 +52,12 @@ export class UsersRepository {
     const totalLikesCount = totalLikes.length ? totalLikes[0].totalLikes : 0;
 
     return { reviewCount, totalLikesCount };
+  }
+
+  async countUserBookmarks(userId: string): Promise<number> {
+    const count = await this.bookmarkModel.countDocuments({
+      userId: new ObjectId(userId),
+    });
+    return count;
   }
 }

@@ -87,14 +87,6 @@ export class BookmarksRepository {
     }
   }
 
-  // 특정 사용자가 북마크한 총 개수를 반환하는 메서드
-  async countUserBookmarks(userId: string): Promise<number> {
-    const count = await this.bookmarkModel.countDocuments({
-      userId: new ObjectId(userId),
-    });
-    return count;
-  }
-
   // 북마크가 있는 모든 사용자의 목록을 가져오는 메서드
   async getAllUsersWithBookmarks(): Promise<
     { userId: string; email: string; name: string }[]
