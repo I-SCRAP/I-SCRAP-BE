@@ -15,10 +15,13 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class PopupsController {
   constructor(private readonly popupsService: PopupsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('detail/:id')
-  getPopupDetail(@Param('id') id: string) {
+  async getPopupDetail(@Param('id') id: string, @Req() req) {
+    const userId = req.user?.id;
     validateRequiredField('id', id);
-    return this.popupsService.getPopupDetail(id);
+    const popupDetail = await this.popupsService.getPopupDetail(id, userId);
+    return popupDetail;
   }
 
   @UseGuards(JwtAuthGuard)

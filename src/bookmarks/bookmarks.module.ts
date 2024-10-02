@@ -17,6 +17,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   controllers: [BookmarksController],
   providers: [BookmarksService, BookmarksRepository],
-  exports: [BookmarksService],
+  exports: [BookmarksService, BookmarksRepository],
 })
 export class BookmarksModule {}
