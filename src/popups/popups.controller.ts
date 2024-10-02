@@ -18,13 +18,6 @@ export class PopupsController {
   @UseGuards(JwtAuthGuard)
   @Get('detail/:id')
   async getPopupDetail(@Param('id') id: string, @Req() req) {
-    // req.user가 존재하지 않으면 UnauthorizedException 던지기
-    if (!req.user) {
-      throw new UnauthorizedException(
-        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
-      );
-    }
-
     const userId = req.user?.id;
     validateRequiredField('id', id);
     const popupDetail = await this.popupsService.getPopupDetail(id, userId);
