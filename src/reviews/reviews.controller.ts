@@ -90,7 +90,7 @@ export class ReviewsController {
 
   @Get(':reviewId/text-review')
   getTextReview(@Param('reviewId') reviewId: string, @Req() req) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     return this.reviewsService.getTextReview(userId, reviewId);
   }
 
