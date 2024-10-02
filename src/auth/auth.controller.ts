@@ -172,10 +172,23 @@ export class AuthController {
   }
 
   // 로그아웃 처리: 쿠키에서 토큰 제거
-  @Post('logout')
+  @Get('logout')
   logout(@Res() res: Response) {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    // ID Token을 쿠키에 저장
+    res.cookie('id_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
+      maxAge: 0, // 브라우저에서 해당 쿠키를 삭제
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 크로스사이트에서 쿠키 전송을 허용, 로컬 환경에서는 Lax로 설정
+    });
+
+    // 구글에서 받은 Refresh Token을 쿠키에 저장
+    res.cookie('refresh_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // 배포 환경에서는 true, 로컬 환경에서는 false
+      maxAge: 0, // 브라우저에서 해당 쿠키를 삭제
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 크로스사이트에서 쿠키 전송을 허용, 로컬 환경에서는 Lax로 설정
+    });
     return res.status(200).json({ message: '로그아웃 성공' });
   }
 }
