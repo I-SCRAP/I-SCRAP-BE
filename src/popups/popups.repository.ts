@@ -212,6 +212,8 @@ export class PopupsRepository {
       }
     }
 
+    popup.isBookmarked = false;
+
     return popup;
   }
 
