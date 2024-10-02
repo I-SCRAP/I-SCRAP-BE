@@ -19,8 +19,11 @@ export class JwtAuthGuard implements CanActivate {
 
     // 쿠키에서 ID Token 가져오기
     const token = request.cookies['id_token'];
+
+    // 토큰이 없는 경우: 인증되지 않은 사용자로 처리 (에러 없이 진행)
     if (!token) {
-      throw new UnauthorizedException('ID Token이 없습니다.');
+      request.user = null;
+      return true;
     }
 
     try {
@@ -52,10 +55,9 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      // ID Token 검증 실패 시도: 인증되지 않은 사용자로 처리
+      // ID Token 검증 실패 시: 인증되지 않은 사용자로 처리 (에러 없이 진행)
       request.user = null;
       return true;
-      // console.error('ID Token 검증 실패 또는 사용자 조회 실패:', error.message);
     }
   }
 }
