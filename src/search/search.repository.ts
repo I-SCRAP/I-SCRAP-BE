@@ -170,6 +170,8 @@ export class SearchRepository {
               },
             },
           },
+          fee: 1,
+          address: '$location.address',
         },
       },
       {
