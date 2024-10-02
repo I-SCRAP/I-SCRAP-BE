@@ -52,10 +52,10 @@ export class JwtAuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      console.error('ID Token 검증 실패 또는 사용자 조회 실패:', error.message);
-      throw new UnauthorizedException(
-        '유효하지 않은 ID Token이거나 사용자 정보를 찾을 수 없습니다.',
-      );
+      // ID Token 검증 실패 시도: 인증되지 않은 사용자로 처리
+      request.user = null;
+      return true;
+      // console.error('ID Token 검증 실패 또는 사용자 조회 실패:', error.message);
     }
   }
 }

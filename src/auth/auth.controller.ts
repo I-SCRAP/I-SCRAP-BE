@@ -164,9 +164,11 @@ export class AuthController {
   @Get('profile')
   getProfile(@Req() req) {
     // req.user는 JwtAuthGuard에서 인증된 사용자 정보가 추가된 객체
-    console.log(req.user.id);
-    const name = req.user.name;
-    return { name: name }; // 인증된 사용자 정보를 반환
+    if (!req.user) {
+      return { message: '로그인되지 않은 사용자입니다.', name: null };
+    }
+
+    return { name: req.user.name };
   }
 
   // 로그아웃 처리: 쿠키에서 토큰 제거
