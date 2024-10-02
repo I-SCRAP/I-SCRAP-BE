@@ -9,6 +9,7 @@ import { SubComment, SubCommentSchema } from './entities/sub-comment.entity';
 import { ReviewLike, ReviewLikeSchema } from './entities/review-like.entity';
 import { S3Service } from 'src/s3/s3.service';
 import { Popup, PopupSchema } from 'src/popups/entities/popup.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Popup, PopupSchema } from 'src/popups/entities/popup.entity';
       { name: ReviewLike.name, schema: ReviewLikeSchema },
       { name: Popup.name, schema: PopupSchema },
     ]),
+    UsersModule,
   ],
   controllers: [ReviewsController],
   providers: [ReviewsService, ReviewsRepository, S3Service],
