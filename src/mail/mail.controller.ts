@@ -9,10 +9,11 @@ export class MailController {
   async sendMail(
     @Body('to') to: string,
     @Body('subject') subject: string,
-    @Body('text') text: string,
+    @Body('templateName') templateName: string, // 템플릿 파일 이름 추가
+    @Body('templateData') templateData: object, // 템플릿에 전달할 데이터 추가
   ) {
     try {
-      await this.mailService.sendEmail(to, subject, text);
+      await this.mailService.sendEmail(to, subject, templateName, templateData);
       return { message: 'Email sent successfully' };
     } catch (error) {
       return { message: 'Error sending email', error: error.message };
