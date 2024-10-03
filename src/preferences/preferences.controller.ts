@@ -28,7 +28,7 @@ export class PreferencesController {
 
   @Get('character')
   getPreferenceCharacter(@Req() req) {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     return this.preferencesService.getPreferenceCharacter(userId);
   }
 }

@@ -25,7 +25,7 @@ export class PreferencesService {
   }
 
   async getPreferenceCharacter(userId: string) {
-    let icecreamCharacter: string =
+    let icecreamCharacter: string | null =
       await this.preferenceRepository.getPreferenceCharacter(userId);
 
     if (!icecreamCharacter) {

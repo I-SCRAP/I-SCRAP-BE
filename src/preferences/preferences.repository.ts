@@ -43,10 +43,13 @@ export class PreferencesRepository {
     return userPreference;
   }
 
-  async getPreferenceCharacter(userId: string): Promise<string> {
+  async getPreferenceCharacter(userId: string): Promise<string | null> {
     const userPreference = await this.getPreference(userId);
-    const icecreamCharacter: string = userPreference.icecreamCharacter;
 
-    return icecreamCharacter;
+    if (userPreference) {
+      const icecreamCharacter = userPreference.icecreamCharacter;
+      return icecreamCharacter;
+    }
+    return null;
   }
 }
