@@ -66,11 +66,7 @@ export class ReviewsService {
   }
 
   async createDefaultReview(userId: string, createReviewDto: CreateReviewDto) {
-    const defaultReviewId = await this.reviewsRepository.createDefaultReview(
-      userId,
-      createReviewDto,
-    );
-    return defaultReviewId;
+    await this.reviewsRepository.createDefaultReview(userId, createReviewDto);
   }
 
   async updateReview(

@@ -9,4 +9,8 @@ export class UsersService {
   async getUserReviewStats(userId: string) {
     return this.usersRepository.getUserReviewStats(userId);
   }
+
+  async countUserBookmarks(userId: string): Promise<number> {
+    return this.usersRepository.countUserBookmarks(userId);
+  }
 }

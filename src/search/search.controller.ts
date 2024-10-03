@@ -1,8 +1,9 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { Popup } from 'src/popups/entities/popup.entity';
 import { validateRequiredField } from '..//utils/validation-utils';
 import { FilterDto } from './dto/filter.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('search')
 export class SearchController {
@@ -14,9 +15,10 @@ export class SearchController {
     return this.searchService.searchPopupsByName(popupName);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('popups/filter')
-  async getFilteredPopups(@Query() filterDto: FilterDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  async getFilteredPopups(@Query() filterDto: FilterDto, @Req() req) {
+    const userId = req.user?.id;
     return this.searchService.getFilteredPopups(userId, filterDto);
   }
 }

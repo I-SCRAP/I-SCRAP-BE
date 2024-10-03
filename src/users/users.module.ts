@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersRepository } from './users.repository';
 import { User, UserSchema } from './entities/user.entity';
@@ -9,7 +9,10 @@ import {
   ReviewLike,
   ReviewLikeSchema,
 } from 'src/reviews/entities/review-like.entity';
-import { BookmarksModule } from 'src/bookmarks/bookmarks.module';
+import {
+  Bookmark,
+  BookmarkSchema,
+} from 'src/bookmarks/entities/bookmarks.entity';
 
 @Module({
   imports: [
@@ -18,7 +21,9 @@ import { BookmarksModule } from 'src/bookmarks/bookmarks.module';
     MongooseModule.forFeature([
       { name: ReviewLike.name, schema: ReviewLikeSchema },
     ]), // ReviewLike 모델 등록
-    forwardRef(() => BookmarksModule), // BookmarksModule 추가
+    MongooseModule.forFeature([
+      { name: Bookmark.name, schema: BookmarkSchema },
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersRepository, UsersService],

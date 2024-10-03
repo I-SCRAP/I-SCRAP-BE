@@ -7,6 +7,8 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -16,26 +18,28 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateSubCommentDto } from './dto/create-sub-comment.dto';
 import { CreateReviewLikeDto } from './dto/create-review-like.dto';
 import { DeleteReviewsDto } from './dto/delete-reviews.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
   @Get()
-  getAllReviews(@Query('page') page: string) {
+  getAllReviews(@Query('page') page: string, @Req() req) {
     validateRequiredField('page', page);
-    const userId = '66b4b5d2f9415815acd65e6a';
+    const userId = req.user.id;
     return this.reviewsService.getAllReviews(userId, page);
   }
 
   @Post('likes')
-  likeReview(@Body() createReviewLikeDto: CreateReviewLikeDto) {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+  likeReview(@Body() createReviewLikeDto: CreateReviewLikeDto, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.likeReview(userId, createReviewLikeDto);
   }
 
   @Get('recent')
-  getRecentReviews() {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getRecentReviews(@Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.getRecentReviews(userId);
   }
 
@@ -45,32 +49,32 @@ export class ReviewsController {
   }
 
   @Delete(':reviewId/likes')
-  unlikeReview(@Param('reviewId') reviewId: string) {
-    const userId = '64dcc0e7f001b623d8a71ba2';
+  unlikeReview(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.unlikeReview(userId, reviewId);
   }
 
   @Get(':reviewId')
-  getReviewById(@Param('reviewId') reviewId: string) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getReviewById(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.getReviewById(userId, reviewId);
   }
 
   @Delete(':reviewId')
-  deleteReview(@Param('reviewId') reviewId: string) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  deleteReview(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.deleteReview(userId, reviewId);
   }
 
   @Delete()
-  deleteReviews(@Body() deleteReviewsDto: DeleteReviewsDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  deleteReviews(@Body() deleteReviewsDto: DeleteReviewsDto, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.deleteReviews(userId, deleteReviewsDto);
   }
 
   @Post()
-  createDefaultReview(@Body() createReviewDto: CreateReviewDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  createDefaultReview(@Body() createReviewDto: CreateReviewDto, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.createDefaultReview(userId, createReviewDto);
   }
 
@@ -78,38 +82,42 @@ export class ReviewsController {
   updateReview(
     @Param('reviewId') reviewId: string,
     @Body() updateReviewDto: UpdateReviewDto,
+    @Req() req,
   ) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+    const userId = req.user.id;
     return this.reviewsService.updateReview(userId, reviewId, updateReviewDto);
   }
 
   @Get(':reviewId/text-review')
-  getTextReview(@Param('reviewId') reviewId: string) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getTextReview(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user?.id;
     return this.reviewsService.getTextReview(userId, reviewId);
   }
 
   @Get(':reviewId/card-review')
-  getCardReview(@Param('reviewId') reviewId: string) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getCardReview(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.getCardReview(userId, reviewId);
   }
 
   @Post('comment')
-  createComment(@Body() createCommentDto: CreateCommentDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  createComment(@Body() createCommentDto: CreateCommentDto, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.createComment(userId, createCommentDto);
   }
 
   @Post('sub-comment')
-  createSubComment(@Body() createSubCommentDto: CreateSubCommentDto) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  createSubComment(
+    @Body() createSubCommentDto: CreateSubCommentDto,
+    @Req() req,
+  ) {
+    const userId = req.user.id;
     return this.reviewsService.createSubComment(userId, createSubCommentDto);
   }
 
   @Get(':reviewId/comments')
-  getAllComments(@Param('reviewId') reviewId: string) {
-    const userId = '66b4b5d2f9415815acd65e6a';
+  getAllComments(@Param('reviewId') reviewId: string, @Req() req) {
+    const userId = req.user.id;
     return this.reviewsService.getAllComments(userId, reviewId);
   }
 }

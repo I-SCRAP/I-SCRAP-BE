@@ -13,7 +13,10 @@ export class SearchRepository {
     @InjectModel(Review.name) private readonly reviewModel: Model<Review>,
   ) {}
 
-  async findFilteredPopups(userId: string, query: any): Promise<Popup[]> {
+  async findFilteredPopups(
+    userId: string | null,
+    query: any,
+  ): Promise<Popup[]> {
     return this.popupModel
       .aggregate([
         { $match: query },
@@ -27,9 +30,24 @@ export class SearchRepository {
         },
         {
           $addFields: {
-            isBookmarked: {
-              $in: [new ObjectId(userId), '$bookmarks.userId'],
-            },
+            isBookmarked: userId
+              ? {
+                  $gt: [
+                    {
+                      $size: {
+                        $filter: {
+                          input: '$bookmarks',
+                          as: 'bookmark',
+                          cond: {
+                            $eq: ['$$bookmark.userId', new ObjectId(userId)],
+                          },
+                        },
+                      },
+                    },
+                    0,
+                  ],
+                }
+              : false,
           },
         },
         {

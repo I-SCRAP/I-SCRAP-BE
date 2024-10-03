@@ -9,6 +9,7 @@ import {
   BookmarkSchema,
 } from 'src/bookmarks/entities/bookmarks.entity';
 import { Review, ReviewSchema } from 'src/reviews/entities/review.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Review, ReviewSchema } from 'src/reviews/entities/review.entity';
       { name: Bookmark.name, schema: BookmarkSchema },
       { name: Review.name, schema: ReviewSchema },
     ]),
+    UsersModule,
   ],
   controllers: [SearchController],
   providers: [SearchService, SearchRepository],
