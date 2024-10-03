@@ -34,8 +34,9 @@ export class PopupsController {
       );
     }
 
+    const userId = req.user?.id;
     const userName = req.user?.name;
-    const popups = await this.popupsService.getPersonalizedPopups();
+    const popups = await this.popupsService.getPersonalizedPopups(userId);
     return {
       userName,
       popups,

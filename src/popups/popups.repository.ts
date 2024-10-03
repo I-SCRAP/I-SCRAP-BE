@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Popup } from './entities/popup.entity'; // Popup 엔티티를 정의한 파일을 임포트
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { S3Service } from 'src/s3/s3.service';
 
@@ -10,6 +10,7 @@ export class PopupsRepository {
   constructor(
     @InjectModel(Popup.name) private readonly popupModel: Model<Popup>,
     private readonly s3Service: S3Service,
+    @InjectConnection() private readonly connection: Connection, // Connection 의존성 주입
   ) {}
 
   async getPopupDetail(popupId: string) {
@@ -287,55 +288,142 @@ export class PopupsRepository {
       .exec();
   }
 
-  async getPersonalizedPopups(): Promise<Popup[]> {
+  async getPersonalizedPopups(userId: string): Promise<Popup[]> {
     const today = new Date();
 
-    const popups = await this.popupModel.aggregate([
-      {
-        $match: {
-          'dateRange.end': { $gte: today }, // 지나간 팝업 제외 (종료 날짜가 오늘 이후인 팝업만 포함)
-        },
-      },
-      {
-        $lookup: {
-          from: 'bookmarks', // bookmarks 컬렉션과 조인
-          localField: '_id', // popups의 _id와 연결
-          foreignField: 'popupId', // bookmarks에서 popupId와 연결
-          as: 'bookmarks',
-        },
-      },
-      {
-        $addFields: {
-          bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          id: '$_id',
-          name: 1,
-          poster: 1,
-          dateRange: {
-            $concat: [
-              {
-                $dateToString: { format: '%Y.%m.%d', date: '$dateRange.start' },
-              },
-              ' - ',
-              { $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' } },
-            ],
-          },
-          fee: 1,
-          category: 1,
-          bookmarkCount: 1,
-          location: '$location.address', // location의 address 필드만 선택
-        },
-      },
-      {
-        $sample: { size: 9 }, // 랜덤으로 9개의 팝업 선택
-      },
-    ]);
+    // 사용자 정보를 직접 DB에서 조회 (의존성 주입된 connection을 통해 users 컬렉션에 접근)
+    const user = await this.connection
+      .collection('users')
+      .findOne({ _id: new ObjectId(userId) });
 
-    return popups;
+    // 선호 카테고리가 없거나 비어있으면 전체 팝업에서 북마크 순으로 9개 추천
+    let personalizedPopups: Popup[] = [];
+
+    if (
+      user &&
+      user.preferredCategories &&
+      user.preferredCategories.length > 0
+    ) {
+      // 선호 카테고리 기반 팝업들 가져오기
+      personalizedPopups = await this.popupModel.aggregate([
+        {
+          $match: {
+            'dateRange.end': { $gte: today }, // 지나간 팝업 제외 (종료 날짜가 오늘 이후인 팝업만 포함)
+            category: { $in: user.preferredCategories }, // 선호 카테고리들 중 하나라도 일치하는 팝업 필터링
+          },
+        },
+        {
+          $lookup: {
+            from: 'bookmarks', // bookmarks 컬렉션과 조인
+            localField: '_id', // popups의 _id와 연결
+            foreignField: 'popupId', // bookmarks에서 popupId와 연결
+            as: 'bookmarks',
+          },
+        },
+        {
+          $addFields: {
+            bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
+          },
+        },
+        {
+          $sort: { bookmarkCount: -1 }, // 북마크 수가 많은 순으로 정렬
+        },
+        {
+          $limit: 9, // 9개의 팝업만 가져오기
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            name: 1,
+            poster: 1,
+            dateRange: {
+              $concat: [
+                {
+                  $dateToString: {
+                    format: '%Y.%m.%d',
+                    date: '$dateRange.start',
+                  },
+                },
+                ' - ',
+                {
+                  $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' },
+                },
+              ],
+            },
+            fee: 1,
+            category: 1,
+            bookmarkCount: 1,
+            location: '$location.address', // location의 address 필드만 선택
+          },
+        },
+      ]);
+    }
+
+    // 9개가 채워지지 않았거나 선호 카테고리가 없으면 전체 팝업에서 북마크 많은 순으로 채우기
+    if (personalizedPopups.length < 9) {
+      const remainingCount = 9 - personalizedPopups.length;
+      const remainingPopups = await this.popupModel.aggregate([
+        {
+          $match: {
+            'dateRange.end': { $gte: today }, // 지나간 팝업 제외
+            _id: {
+              $nin: personalizedPopups.map((popup) => new ObjectId(popup.id)),
+            }, // 이미 선택된 팝업은 제외
+          },
+        },
+        {
+          $lookup: {
+            from: 'bookmarks', // bookmarks 컬렉션과 조인
+            localField: '_id', // popups의 _id와 연결
+            foreignField: 'popupId', // bookmarks에서 popupId와 연결
+            as: 'bookmarks',
+          },
+        },
+        {
+          $addFields: {
+            bookmarkCount: { $size: '$bookmarks' }, // 북마크 수 계산
+          },
+        },
+        {
+          $sort: { bookmarkCount: -1 }, // 북마크 수가 많은 순으로 정렬
+        },
+        {
+          $limit: remainingCount, // 필요한 만큼만 가져오기
+        },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            name: 1,
+            poster: 1,
+            dateRange: {
+              $concat: [
+                {
+                  $dateToString: {
+                    format: '%Y.%m.%d',
+                    date: '$dateRange.start',
+                  },
+                },
+                ' - ',
+                {
+                  $dateToString: { format: '%Y.%m.%d', date: '$dateRange.end' },
+                },
+              ],
+            },
+            fee: 1,
+            category: 1,
+            bookmarkCount: 1,
+            location: '$location.address', // location의 address 필드만 선택
+          },
+        },
+      ]);
+
+      // 기존 personalizedPopups에 나머지 팝업 추가
+      personalizedPopups = personalizedPopups.concat(remainingPopups);
+    }
+
+    return personalizedPopups;
   }
 
   async getMonthlyPopups(): Promise<Popup[]> {

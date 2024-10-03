@@ -23,8 +23,8 @@ export class PopupsService {
     return popupDetail;
   }
 
-  async getPersonalizedPopups() {
-    return this.popupsRepository.getPersonalizedPopups();
+  async getPersonalizedPopups(userId: string) {
+    return this.popupsRepository.getPersonalizedPopups(userId);
   }
 
   async getMonthlyPopups() {
