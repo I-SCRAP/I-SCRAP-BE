@@ -34,7 +34,7 @@ export class PreferencesService {
     const icecreamCharacterImage: string =
       await this.s3Service.generatePresignedDownloadUrlForPublicFile(
         process.env.S3_IMAGE_BUCKET,
-        `icecreamCharacter/${icecreamCharacter}.svg`,
+        `icecreamCharacter/${icecreamCharacter}.png`,
       );
 
     return icecreamCharacterImage;
